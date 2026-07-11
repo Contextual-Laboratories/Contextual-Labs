@@ -42,3 +42,6 @@ URL scheme on the rendered site: 1:1 with this folder structure —
 Structure only, no real content — content authoring is a separate,
 later pass (see `Teams/TODO.md`). This phase is infrastructure: the sync
 mechanism, the URL scheme, the taxonomy shape.
+
+---
+Pipeline test: 2026-07-11T14:59:07Z
