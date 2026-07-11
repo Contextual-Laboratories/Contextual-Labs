@@ -29,10 +29,14 @@ reference, explanation):
 - [`docs/cli/`](docs/cli/) — the Python CLI
 - [`docs/mcp-server/`](docs/mcp-server/) — the MCP server and its tools
 - [`docs/web-dashboard/`](docs/web-dashboard/) — the web dashboard
+- [`docs/concepts/`](docs/concepts/) — cross-cutting architecture/concepts
+- [`docs/account/`](docs/account/) — licensing, trial, device management
+- [`docs/changelog/`](docs/changelog/) — release notes
 
 This repository is a published mirror, not the authoring source — technical
-docs are written once upstream and synced here automatically. See each
-folder's `README.md` for what belongs where.
+docs are written once upstream (in `Contextual/docs/Public/`) and synced
+here automatically on every merge. See each folder's `README.md` for what
+belongs where.
 
 ## Support
 
@@ -42,5 +46,8 @@ folder's `README.md` for what belongs where.
 
 ## License
 
-This repository (documentation content) and the Contextual engine are
-licensed separately. See [`LICENSE`](LICENSE) for the terms that apply here.
+All rights reserved — this repository's content is publicly viewable, not
+publicly licensed. No commercial use, copying, or redistribution is
+permitted. See [`LICENSE`](LICENSE). The Contextual engine (CLI/MCP
+server) is licensed separately, under BUSL 1.1 — see the `Contextual`
+repository.

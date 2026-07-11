@@ -1,0 +1,19 @@
+Copyright (c) 2026 Arjun Mahule. All rights reserved.
+
+This repository and its contents (including documentation, text, issue
+templates, workflow configuration, and any other files herein) are made
+publicly viewable for informational purposes only.
+
+No license, express or implied, is granted to any person to copy,
+reproduce, republish, redistribute, modify, create derivative works from,
+or make commercial use of any content in this repository, in whole or in
+part, without prior written permission from the copyright holder.
+
+Viewing this repository, and submitting issues or feedback through it,
+does not grant any rights to its contents.
+
+This license applies to this repository only. The Contextual engine (CLI
+and MCP server) is licensed separately under the Business Source License
+1.1 — see the `Contextual` repository for those terms.
+
+All rights not expressly granted herein are reserved.

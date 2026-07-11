@@ -1,34 +1,44 @@
-# Documentation
+# docs/Public
 
-This tree is a **published mirror**. Technical content is authored once in
-the private `Contextual` engine repo (`docs/Public/`) and synced here
-automatically via a GitHub Action on merge — don't hand-author technical
-content directly in this repo, it'll be overwritten/diverge from the source
-of truth. `README.md` files (this one, and the section-level ones below)
-and anything under `.github/` are the exception — those are authored
-directly in this repo.
+This is the **only** part of `Contextual/docs/` that ever leaves this
+repo. Everything else in `docs/` is private, internal engineering
+documentation and stays here.
+
+## What this is
+
+The authoring source for Contextual's public documentation. Written here,
+in the same PR as the code change that made a doc update necessary.
+Synced automatically to the public `Contextual-Labs` repo on every merge
+to main that touches this folder — never edited by hand over there, and
+never touched directly by anyone outside this repo.
+
+`Contextual-Labs` is the published, publicly-browsable copy and also
+where GitHub Issues lives as the real customer support/bug-report
+channel. `Contextual-Web`'s marketing site renders the final docs website
+by pulling from `Contextual-Labs` at build time. One-way flow: author
+here → publish on Labs → render on Web.
 
 ## Structure
 
-Docs are split by product surface, and each surface follows the
-[Diátaxis](https://diataxis.fr/) framework — four categories organized by
-what the reader is trying to do, not by feature:
+Mirrors `Contextual-Labs`'s own structure 1:1 (surface × Diataxis
+category), so the sync is a plain recursive file copy with no path
+remapping:
 
 ```
-docs/
-├── cli/            the Python CLI (contextual-engine on PyPI)
-├── mcp-server/      the MCP server and its tools
-└── web-dashboard/   the web dashboard
-    ├── tutorials/    learning-oriented — step by step, for first-time setup
-    ├── how-to/       problem-oriented — "how do I do X"
-    ├── reference/    information-oriented — exhaustive, dry, accurate (CLI flags, MCP tool schemas, config keys)
-    └── explanation/  understanding-oriented — architecture, concepts, why things work the way they do
+cli/            {tutorials, how-to, reference, explanation}/
+mcp-server/     {tutorials, how-to, reference, explanation}/
+web-dashboard/  {tutorials, how-to, reference, explanation}/
+concepts/       cross-cutting explanation (architecture, graph layer, temporal)
+account/        licensing, trial, device management
+changelog/       release notes (intended to be live-pulled eventually)
 ```
 
-This exact shape (`<surface>/<diátaxis-category>/`) is the sync target —
-`Contextual/docs/Public/` mirrors it 1:1 so the sync Action is a plain file
-copy, no path remapping.
+URL scheme on the rendered site: 1:1 with this folder structure —
+`/docs/cli/reference/login` maps directly to
+`cli/reference/login.md` here.
 
-No versioning yet — this is a single, always-current "latest" tree
-(pre-1.0; see `Teams/DRs/PERPLEXITY-DR-docs-socials.md` Part B for why that's
-deliberate, not an oversight).
+## What's not here yet
+
+Structure only, no real content — content authoring is a separate,
+later pass (see `Teams/TODO.md`). This phase is infrastructure: the sync
+mechanism, the URL scheme, the taxonomy shape.
