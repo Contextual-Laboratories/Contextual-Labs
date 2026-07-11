@@ -1,0 +1,26 @@
+name: "📝 Documentation Issue"
+description: Report incorrect, unclear, or missing documentation
+labels: ["docs"]
+body:
+  - type: textarea
+    id: location
+    attributes:
+      label: Where
+      description: Link or path to the doc page/section this is about
+      placeholder: docs/cli/reference/... or the docs site URL
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What's wrong or missing
+      description: Incorrect info, unclear explanation, broken example, missing topic — be specific
+    validations:
+      required: true
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Suggested fix (optional)
+      description: If you know what it should say instead, tell us
+    validations:
+      required: false
