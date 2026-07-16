@@ -1,6 +1,6 @@
 name: "✨ Feature Request"
 description: Suggest a new capability for the Contextual CLI, MCP server, or web dashboard
-labels: ["enhancement"]
+labels: ["type: feature-request", "status: needs-triage"]
 body:
   - type: textarea
     id: problem

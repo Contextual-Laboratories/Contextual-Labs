@@ -4,7 +4,7 @@ If you find a security vulnerability in the Contextual CLI, MCP server, or
 any Contextual Labs product, please report it privately — do not open a
 public GitHub issue.
 
-**Report to:** security@contextuallabs.dev
+**Report to:** team@contextuallabs.dev
 
 Please include:
 - A description of the vulnerability and its potential impact

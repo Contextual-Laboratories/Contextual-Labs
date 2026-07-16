@@ -1,5 +1,9 @@
 # Contextual
 
+[![Docs Sync](https://github.com/Contextual-Laboratory/Contextual-Labs/actions/workflows/dispatch-to-web.yml/badge.svg)](https://github.com/Contextual-Laboratory/Contextual-Labs/actions/workflows/dispatch-to-web.yml)
+[![License](https://img.shields.io/badge/license-All%20Rights%20Reserved-blue.svg)](LICENSE)
+[![Latest Release](https://img.shields.io/github/v/release/Contextual-Laboratory/Contextual-Labs?include_prereleases)](https://github.com/Contextual-Laboratory/Contextual-Labs/releases)
+
 Temporal, semantic code intelligence for your codebase — a local-first CLI
 and MCP server that gives coding agents grounded, timestamped, searchable
 context instead of guesses.
@@ -42,7 +46,7 @@ belongs where.
 
 - **Docs feedback, product bugs, feature requests:** [GitHub Issues](../../issues) —
   pick the template that matches.
-- **Everything else:** support@contextuallabs.dev
+- **Everything else:** team@contextuallabs.dev
 
 ## License
 

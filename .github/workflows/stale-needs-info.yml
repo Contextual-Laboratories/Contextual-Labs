@@ -1,0 +1,39 @@
+name: Stale needs-info issues
+
+# actions/stale is a GitHub-maintained official Action (actions/ org), same
+# trust tier as actions/checkout — not a third-party marketplace Action.
+#
+# Scoped deliberately narrow: only-labels restricts this to
+# "status: needs-info" issues (waiting on the reporter), and PR staleness is
+# disabled outright. This must never touch an issue waiting on maintainer
+# action — a blanket stale-bot is the wrong pattern for a support channel.
+
+on:
+  schedule:
+    - cron: "0 0 * * *" # daily at midnight UTC
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  stale:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/stale@v9
+        with:
+          days-before-stale: 14
+          days-before-close: 7
+          only-labels: "status: needs-info"
+          exempt-issue-labels: "status: needs-triage,status: investigating"
+          stale-issue-label: "stale"
+          days-before-pr-stale: -1
+          days-before-pr-close: -1
+          stale-issue-message: >
+            This issue has been marked as stale because it's been 14 days
+            since we requested more information and haven't received a
+            response. If you're still experiencing this, please reply with
+            the requested details — otherwise this will close in 7 days.
+          close-issue-message: >
+            Closing due to lack of response. If you're still experiencing
+            this, please open a new issue with the requested information.

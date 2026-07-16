@@ -1,0 +1,45 @@
+name: Check Links
+
+# Zero third-party Actions, deliberately — same convention as
+# dispatch-to-web.yml. Broken-link checking is a plain curl loop over
+# links extracted from markdown, not a third-party marketplace Action.
+
+on:
+  schedule:
+    - cron: "0 0 * * 1" # weekly, Monday midnight UTC
+  workflow_dispatch:
+
+jobs:
+  link-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check external links in markdown
+        run: |
+          set -uo pipefail
+          fail=0
+
+          urls=$(grep -rhoE '\]\((https?://[^) ]+)\)' --include='*.md' . \
+            | sed -E 's/^\]\(//; s/\)$//' \
+            | sort -u)
+
+          for url in $urls; do
+            case "$url" in
+              *localhost*|*example.com*|*127.0.0.1*)
+                continue
+                ;;
+            esac
+
+            code=$(curl -s -o /dev/null -w "%{http_code}" -L --max-time 20 --retry 2 --retry-delay 3 "$url" || echo "000")
+            case "$code" in
+              200|206|301|302|303|307|308)
+                ;;
+              *)
+                echo "::error::Broken link ($code): $url"
+                fail=1
+                ;;
+            esac
+          done
+
+          exit $fail

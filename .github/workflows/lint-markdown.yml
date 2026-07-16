@@ -1,0 +1,23 @@
+name: Lint Markdown
+
+# Zero third-party Actions, deliberately — same convention as
+# dispatch-to-web.yml. markdownlint-cli2 is installed via npm at run time
+# (official actions/checkout + actions/setup-node only), not invoked
+# through a third-party marketplace Action.
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Run markdownlint-cli2
+        run: npx --yes markdownlint-cli2 "**/*.md"

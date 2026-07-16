@@ -4,5 +4,5 @@ contact_links:
     url: https://github.com/Contextual-Laboratory/Contextual-Labs/security/policy
     about: Please report vulnerabilities privately — see SECURITY.md, do not open a public issue.
   - name: Account, billing, or other private support
-    url: mailto:support@contextuallabs.dev
+    url: mailto:team@contextuallabs.dev
     about: For anything that shouldn't be public.

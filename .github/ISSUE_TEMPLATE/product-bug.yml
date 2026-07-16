@@ -1,6 +1,6 @@
 name: "🐛 Product Bug"
 description: Report a problem with the Contextual CLI, MCP server, or web dashboard (not documentation)
-labels: ["bug"]
+labels: ["type: bug", "status: needs-triage"]
 body:
   - type: textarea
     id: description
