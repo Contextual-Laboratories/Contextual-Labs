@@ -1,0 +1,50 @@
+version: "0.0.1-e2e-test"
+date: "2026-07-17"
+commit: "e5186d6"
+summary: >
+  Dummy release used to rehearse the changelog pipeline end-to-end
+  (Contextual → Contextual-Labs → Contextual-Web) with the `contextual
+  changelog` schema before the real v1.0.0 launch. Not a real release —
+  safe to ignore.
+entries:
+  - tag: feature
+    title: "`contextual changelog verify` — a new dry-run validator"
+    description: >
+      Adds a local command that checks a changelog YAML file against the
+      locked schema before it's committed, so a typo is caught before the
+      docs sync fires instead of after.
+    content:
+      type: code
+      label: terminal
+      code: |
+        $ contextual changelog verify docs/Public/changelog/v0.0.1-e2e-test.yaml
+          ✓ schema valid
+          ✓ 4 entries, tags: feature, improvement, fix, breaking
+          ✓ 1 code block, 1 stat-compare block
+  - tag: improvement
+    title: "Cold-cache recall is faster on the rehearsal dataset"
+    description: >
+      Dummy benchmark numbers included purely to exercise the
+      stat-compare content block end-to-end.
+    content:
+      type: stat-compare
+      title: "Cold-cache recall · p50 (dummy data)"
+      unit: "milliseconds, lower = better"
+      items:
+        - label: "v0.0.1-e2e-test (before)"
+          valueLabel: "590ms"
+          widthPercent: 100
+        - label: "v0.0.1-e2e-test (after)"
+          valueLabel: "186ms"
+          widthPercent: 31.5
+  - tag: fix
+    title: "Fixed a dummy off-by-one in the rehearsal counter"
+    description: >
+      Placeholder fix entry with no content block, to confirm plain
+      bullet-style entries render correctly alongside the richer ones
+      above.
+  - tag: breaking
+    title: "Removed the fictional `--legacy-mode` flag"
+    description: >
+      Placeholder breaking-change entry, included to confirm the
+      breaking tag chip and filter pill both render for dummy data.
