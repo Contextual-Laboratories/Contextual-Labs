@@ -1,0 +1,43 @@
+version: "0.0.2-e2e-test"
+date: "2026-07-19"
+commit: "4459483"
+summary: >
+  [E2E TEST — 2026-07-19] Second dummy release used to confirm tagged
+  changelog data actually flows live through all three repos
+  (Contextual → Contextual-Labs → Contextual-Web) onto the deployed site,
+  after `v0.0.1-e2e-test` turned out to never have synced past Contextual.
+  Not a real release — safe to ignore.
+entries:
+  - tag: feature
+    title: "E2E TEST 2026-07-19 — confirming live sync end-to-end"
+    description: >
+      This entry exists purely to be visually confirmed on the deployed
+      `/docs/changelog` page. If you're reading this on the live site,
+      the Contextual → Contextual-Labs → Contextual-Web pipeline is
+      confirmed working for changelog content specifically, not just
+      the rest of `/docs/*`.
+    content:
+      type: code
+      label: terminal
+      code: |
+        $ contextual changelog verify docs/Public/changelog/v0.0.2-e2e-test.yaml
+          ✓ schema valid
+          ✓ 2 entries, tags: feature, improvement
+          ✓ 1 code block, 1 stat-compare block
+  - tag: improvement
+    title: "E2E TEST — dummy stat-compare block renders correctly"
+    description: >
+      Placeholder benchmark numbers included purely to exercise the
+      stat-compare content block end-to-end, same as the previous
+      rehearsal entry.
+    content:
+      type: stat-compare
+      title: "Cold-cache recall · p50 (dummy data)"
+      unit: "milliseconds, lower = better"
+      items:
+        - label: "v0.0.2-e2e-test (before)"
+          valueLabel: "590ms"
+          widthPercent: 100
+        - label: "v0.0.2-e2e-test (after)"
+          valueLabel: "186ms"
+          widthPercent: 31.5
