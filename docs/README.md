@@ -28,20 +28,54 @@ remapping:
 cli/            {tutorials, how-to, reference, explanation}/
 mcp-server/     {tutorials, how-to, reference, explanation}/
 web-dashboard/  {tutorials, how-to, reference, explanation}/
-concepts/       cross-cutting explanation (architecture, graph layer, temporal)
+engine/         {tutorials, how-to, reference, explanation,
+                 troubleshooting, observability}/
 account/        licensing, trial, device management
 changelog/       release notes (intended to be live-pulled eventually)
 ```
+
+`engine/` replaced the earlier `concepts/` placeholder — full Diátaxis
+coverage for indexing/retrieval/graph/temporal internals, not just a
+handful of explanation pages, plus two sub-clusters that aren't general
+Diátaxis categories: `troubleshooting/` (symptom-indexed lookups) and
+`observability/` (logs, telemetry, `doctor` output).
 
 URL scheme on the rendered site: 1:1 with this folder structure —
 `/docs/cli/reference/login` maps directly to
 `cli/reference/login.md` here.
 
-## What's not here yet
+## Page frontmatter
 
-Structure only, no real content — content authoring is a separate,
-later pass (see `Teams/TODO.md`). This phase is infrastructure: the sync
-mechanism, the URL scheme, the taxonomy shape.
+Every authored page (not the category `README.md` stubs) carries:
+
+```yaml
+---
+title: string          # required. page H1 / <title>.
+domain: cli | mcp-server | engine | account | web-dashboard | changelog
+category: tutorial | how-to | reference | explanation
+          | troubleshooting | observability
+          # troubleshooting/observability are engine/-only.
+tldr: string           # required. 1-2 plain-text sentences, no markdown.
+                       # feeds llms.txt entries + the search index; also
+                       # restated by hand as the page's opening
+                       # <Callout variant="tldr"> in the body.
+order: integer         # optional. sort weight within a category.
+related: string[]      # optional. relative paths for "see also" links.
+---
+```
+
+`<Callout variant="tldr" | "note" | "warning">` and
+`<Terminal lines={[...]} />` are both real, live MDX components — usable
+directly in this markdown with no per-file import. See
+`Teams/Memory/docs-authoring-components-2026-07-23.md` for the full
+component contract.
+
+## Status
+
+Content authoring is underway (see `Teams/Operations/docs-content-
+buildout-joint-mission.md` for the tracked plan) — a first real slice
+exists in `cli/tutorials/` and `engine/`; most pages across all domains
+are still structure-only stubs, filled in over subsequent passes.
 
 ---
 Pipeline test: 2026-07-11T14:59:07Z
