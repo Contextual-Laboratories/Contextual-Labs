@@ -41,4 +41,4 @@ content through `contextual client --windsurf` instead.
 ## See also
 
 - `cli/reference/skill-rm`.
-- `cli/reference/client`.
+- `cli/reference/client/client`.

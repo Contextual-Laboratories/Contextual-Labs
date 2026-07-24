@@ -47,7 +47,7 @@ Once more than one workspace is registered, tools won't guess which one
 you mean if it's ambiguous — they'll ask you to specify. In practice
 this means naming the workspace explicitly in your question to your AI
 client ("in api-core, what calls...") rather than assuming context. See
-`engine/troubleshooting/workspace-not-connecting` for exactly what each
+`troubleshooting/workspace-not-connecting` for exactly what each
 of the three possible registry-related errors means if this goes wrong.
 
 ## Removing a workspace later
@@ -61,5 +61,5 @@ or its `.contextual/` directory.
 
 ## See also
 
-- `cli/reference/workspace-add`, `cli/reference/workspace-list`,
-  `cli/reference/workspace-rm`.
+- `cli/reference/workspace/workspace-add`, `cli/reference/workspace/workspace-list`,
+  `cli/reference/workspace/workspace-rm`.

@@ -124,7 +124,8 @@ real, current information about your code rather than a guess.
 That's the full loop. From here:
 - `cli/how-to/` covers specific tasks (adding a second client, forcing a
   full re-index, running the daemon in the background).
-- `mcp-server/tutorials/` covers the same first-question moment from the
+- `mcp/tools/tutorials/` covers the same first-question moment from the
   tool side, in more depth.
-- `engine/explanation/` covers how indexing, retrieval, and the
-  knowledge graph actually work under the hood.
+- `indexing/explanation/`, `retrieval/explanation/`, and
+  `graph/explanation/` cover how indexing, retrieval, and the knowledge
+  graph actually work under the hood.

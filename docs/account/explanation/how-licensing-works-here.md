@@ -43,11 +43,11 @@ A Solo license is bound to a single active device. This is enforced at
 activation, not layered on top afterward — trying to activate a second
 device without deactivating the first is exactly the `wrong_device`
 state covered in the reference page. Moving machines is a normal,
-supported action (`cli/reference/deactivate` then `contextual login` on
+supported action (`cli/reference/general/deactivate` then `contextual login` on
 the new one), not something you have to work around.
 
 ## See also
 
 - `account/reference/activation-error-and-state-reference`.
-- `engine/reference/data-privacy` for the broader "what stays local"
+- `trust-and-privacy/reference/data-privacy` for the broader "what stays local"
   picture beyond just licensing.

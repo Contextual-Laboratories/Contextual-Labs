@@ -38,8 +38,8 @@ either command, that change came from something else — not Contextual.
 
 For the actual stage-by-stage mechanics of indexing (blame history and
 graph extraction run first, then chunking and embedding — not the order
-you'd guess), see `engine/explanation/how-indexing-works`.
+you'd guess), see `indexing/explanation/how-indexing-works`.
 
 ## See also
 
-- `cli/reference/init`, `cli/reference/index`.
+- `cli/reference/general/init`, `cli/reference/general/index`.

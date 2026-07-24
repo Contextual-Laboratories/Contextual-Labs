@@ -18,31 +18,55 @@ channel. `Contextual-Web`'s marketing site renders the final docs website
 by pulling from `Contextual-Labs` at build time. One-way flow: author
 here → publish on Labs → render on Web.
 
-## Structure
+## Structure (restructured 2026-07-25 — see `Teams/Operations/docs-domain-restructure-2026-07-25.md`)
 
-Mirrors `Contextual-Labs`'s own structure 1:1 (surface × Diataxis
-category), so the sync is a plain recursive file copy with no path
-remapping:
+17 top-level domains, each following Diátaxis internally
+(`tutorials/how-to/reference/explanation`, plus two cross-cutting,
+non-Diátaxis sections below). Replaces the prior 6-domain shape
+(`cli/`, `mcp-server/`, `engine/`, `account/`, `web-dashboard/`,
+`changelog/`) — `engine/` and `mcp-server/` are fully dissolved,
+`web-dashboard/` is renamed, nothing else from the old tree survives
+under its old name.
 
 ```
-cli/            {tutorials, how-to, reference, explanation}/
-mcp-server/     {tutorials, how-to, reference, explanation}/
-web-dashboard/  {tutorials, how-to, reference, explanation}/
-engine/         {tutorials, how-to, reference, explanation,
-                 troubleshooting, observability}/
-account/        licensing, trial, device management
-changelog/       release notes (intended to be live-pulled eventually)
+getting-started/    site map, architecture overview, guided tour, wayfinding
+cli/                 reference/{general,config,client,mcp,workspace,skill}/, + tutorials, how-to, explanation
+mcp/
+  server/            the daemon: lifecycle, hot-reload, access control
+  tools/             all 22 MCP tools: reference, how-to, explanation, tutorials
+indexing/            chunking, embedding, graph extraction, blame, sizing, language support
+retrieval/           hybrid BM25+dense+trigram ranking, MMR diversity
+graph/               entities, predicates, confidence tiers, CHA/RTA
+temporal/            blame-enriched history, staleness scoring, co-change
+nexus/               what nexus_search adds over search
+models/              the embedding model stack
+configuration/       config keys, precedence, what each one controls
+observability/       logs, doctor output, OTel tracing (what's real vs. not-yet-surfaced)
+troubleshooting/      cross-cutting, symptom-indexed — NOT nested under any one subsystem
+integrations/        one reference page per supported AI client (11), + connect/switch/remove
+trust-and-privacy/   what stays local, license/auth model, security disclosure scope
+account/             CLI-side license/trial/activation (node-locked model)
+website/             account dashboard: billing, login/auth, device management
+changelog/           release notes (intended to be live-pulled eventually)
 ```
 
-`engine/` replaced the earlier `concepts/` placeholder — full Diátaxis
-coverage for indexing/retrieval/graph/temporal internals, not just a
-handful of explanation pages, plus two sub-clusters that aren't general
-Diátaxis categories: `troubleshooting/` (symptom-indexed lookups) and
-`observability/` (logs, telemetry, `doctor` output).
+`troubleshooting/` and `observability/` are deliberately **not** nested
+inside any single subsystem domain, even though they're engine-adjacent —
+a user hitting "MCP daemon not responding" doesn't know in advance
+whether that's an indexing, retrieval, or graph problem, so both stay
+cross-cutting and symptom/log-indexed rather than fragmented per
+subsystem (mirrors Stripe's unified error-code reference).
 
-URL scheme on the rendered site: 1:1 with this folder structure —
-`/docs/cli/reference/login` maps directly to
-`cli/reference/login.md` here.
+`mcp/server/` and `mcp/tools/` share the `mcp/` URL prefix but are two
+distinct `domain` values in frontmatter (`mcp-server`, `mcp-tools`) —
+the one deliberate exception to "domain value == top-level folder name"
+in this tree. `cli/reference/` nests one level deeper by command family
+(`general`, `config`, `client`, `mcp`, `workspace`, `skill`) — still a
+single `cli` domain, just an extra path segment under `reference/` only.
+
+URL scheme is otherwise still 1:1 with this folder structure —
+`/docs/cli/reference/general/login` maps directly to
+`cli/reference/general/login.md` here.
 
 ## Page frontmatter
 
@@ -51,10 +75,13 @@ Every authored page (not the category `README.md` stubs) carries:
 ```yaml
 ---
 title: string          # required. page H1 / <title>.
-domain: cli | mcp-server | engine | account | web-dashboard | changelog
+domain: getting-started | cli | mcp-server | mcp-tools | indexing
+       | retrieval | graph | temporal | nexus | models | configuration
+       | observability | troubleshooting | integrations
+       | trust-and-privacy | account | website | changelog
 category: tutorial | how-to | reference | explanation
-          | troubleshooting | observability
-          # troubleshooting/observability are engine/-only.
+          # troubleshooting has no sub-categories, its domain folder holds
+          # pages directly.
 tldr: string           # required. 1-2 plain-text sentences, no markdown.
                        # feeds llms.txt entries + the search index; also
                        # restated by hand as the page's opening
@@ -72,10 +99,18 @@ component contract.
 
 ## Status
 
-Content authoring is underway (see `Teams/Operations/docs-content-
-buildout-joint-mission.md` for the tracked plan) — a first real slice
-exists in `cli/tutorials/` and `engine/`; most pages across all domains
-are still structure-only stubs, filled in over subsequent passes.
+**Structural scaffold complete, 2026-07-25**: every domain/subdomain
+above exists on disk with real frontmatter (title, domain, category,
+tldr) on every page. Pages carried over from the prior 6-domain tree
+(`cli/`, `mcp-server/`, `engine/`, `web-dashboard/`) are real, previously
+-authored content, moved and re-pointed — not stubs. Net-new pages (the
+six former-`engine/`-subsystem domains' extra depth, all 11
+`integrations/reference/` pages, `observability/`'s OTel-specific pages,
+`getting-started/`'s wayfinding page) are structural placeholders —
+real title/domain/category/tldr, body content not yet written. See
+`Teams/Operations/docs-domain-restructure-2026-07-25.md` for the full
+before/after page manifest and what's pending Web's confirmation before
+the real content-authoring pass begins.
 
 ---
 Pipeline test: 2026-07-11T14:59:07Z

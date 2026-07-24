@@ -14,7 +14,7 @@ login` is what actually activates the license on a given device.
 
 ## 1. Create your account
 
-Sign up on the website first (see `web-dashboard/tutorials/create-an-
+Sign up on the website first (see `website/tutorials/create-an-
 account-and-link-your-first-device` for that side of the flow). This is
 what provisions your trial.
 
@@ -52,5 +52,5 @@ A Solo license activates one device at a time. See
 
 ## See also
 
-- `cli/reference/login`, `cli/reference/account`.
+- `cli/reference/general/login`, `cli/reference/general/account`.
 - `account/explanation/how-licensing-works-here`.

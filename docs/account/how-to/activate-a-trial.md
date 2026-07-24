@@ -30,6 +30,6 @@ contextual login --device-code
 
 ## See also
 
-- `web-dashboard/how-to/start-your-trial-and-subscribe-when-ready` —
+- `website/how-to/start-your-trial-and-subscribe-when-ready` —
   the website side of this same flow.
-- `cli/reference/login`.
+- `cli/reference/general/login`.

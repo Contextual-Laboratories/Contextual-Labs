@@ -30,5 +30,5 @@ effect alongside a forced full rebuild, not on its own.
 
 ## See also
 
-- `cli/reference/index`.
-- `engine/explanation/how-indexing-works`.
+- `cli/reference/general/index`.
+- `indexing/explanation/how-indexing-works`.

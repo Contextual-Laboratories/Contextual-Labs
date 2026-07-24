@@ -38,4 +38,4 @@ it.
 
 ## See also
 
-- `cli/reference/deactivate`, `cli/reference/login`, `cli/reference/logout`.
+- `cli/reference/general/deactivate`, `cli/reference/general/login`, `cli/reference/general/logout`.

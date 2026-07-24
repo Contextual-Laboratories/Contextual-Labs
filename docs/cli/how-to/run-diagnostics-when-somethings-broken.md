@@ -24,6 +24,6 @@ contextual doctor
 
 ## See also
 
-- `cli/reference/doctor`.
-- `engine/observability/interpreting-doctor-report` — what every check
+- `cli/reference/general/doctor`.
+- `observability/how-to/interpreting-doctor-report` — what every check
   actually means.

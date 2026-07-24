@@ -56,4 +56,4 @@ in an unexplained way.
 ## See also
 
 - `account/how-to/troubleshoot-a-failed-activation`.
-- `cli/reference/account`, `cli/reference/doctor`.
+- `cli/reference/general/account`, `cli/reference/general/doctor`.

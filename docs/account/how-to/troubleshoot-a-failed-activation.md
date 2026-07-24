@@ -51,4 +51,4 @@ deactivate on the old device first.
 ## See also
 
 - `account/reference/activation-error-and-state-reference`.
-- `cli/reference/account`, `cli/reference/doctor`.
+- `cli/reference/general/account`, `cli/reference/general/doctor`.
