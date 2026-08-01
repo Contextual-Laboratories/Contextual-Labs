@@ -20,7 +20,7 @@ here → publish on Labs → render on Web.
 
 ## Structure (restructured 2026-07-25 — see `Teams/Operations/docs-domain-restructure-2026-07-25.md`)
 
-17 top-level domains, each following Diátaxis internally
+18 top-level domains, each following Diátaxis internally
 (`tutorials/how-to/reference/explanation`, plus two cross-cutting,
 non-Diátaxis sections below). Replaces the prior 6-domain shape
 (`cli/`, `mcp-server/`, `engine/`, `account/`, `web-dashboard/`,
@@ -42,6 +42,7 @@ nexus/               what nexus_search adds over search
 models/              the embedding model stack
 configuration/       config keys, precedence, what each one controls
 observability/       logs, doctor output, OTel tracing (what's real vs. not-yet-surfaced)
+evaluation/          golden repos, query suite, metrics, hardware profiles behind any accuracy claim
 troubleshooting/      cross-cutting, symptom-indexed — NOT nested under any one subsystem
 integrations/        one reference page per supported AI client (11), + connect/switch/remove
 trust-and-privacy/   what stays local, license/auth model, security disclosure scope
@@ -68,6 +69,18 @@ URL scheme is otherwise still 1:1 with this folder structure —
 `/docs/cli/reference/general/login` maps directly to
 `cli/reference/general/login.md` here.
 
+## meta.json
+
+Root-level `meta.json` carries a single `docsVersion` field — the engine
+version this docs tree has actually been verified against, not
+necessarily whatever's newest on PyPI (PyPI can run ahead of doc
+verification). Bump it by hand whenever a content-authoring pass is
+checked against a release. Web's `fetch-docs-content.mjs` stages the
+whole tree already (see `generate-docs-pages.mjs`'s `.md`-only filter —
+this file is skipped by the page walk, so it's safe as a sibling to the
+domain folders), so no separate sync step is needed for it to reach
+`Contextual-Labs`.
+
 ## Page frontmatter
 
 Every authored page (not the category `README.md` stubs) carries:
@@ -77,7 +90,7 @@ Every authored page (not the category `README.md` stubs) carries:
 title: string          # required. page H1 / <title>.
 domain: getting-started | cli | mcp-server | mcp-tools | indexing
        | retrieval | graph | temporal | nexus | models | configuration
-       | observability | troubleshooting | integrations
+       | observability | evaluation | troubleshooting | integrations
        | trust-and-privacy | account | website | changelog
 category: tutorial | how-to | reference | explanation
           # troubleshooting has no sub-categories, its domain folder holds
@@ -111,6 +124,16 @@ real title/domain/category/tldr, body content not yet written. See
 `Teams/Operations/docs-domain-restructure-2026-07-25.md` for the full
 before/after page manifest and what's pending Web's confirmation before
 the real content-authoring pass begins.
+
+**`evaluation/` domain added, 2026-07-31**: scaffold-only, same convention
+as above — real title/domain/category/tldr on every page, bodies not yet
+written. Deliberately held back from a real content-authoring pass until
+every golden repo in `eval/manifest.yml` has a verified baseline on the
+`m2_air_8gb` (primary target) hardware profile; as of this date only 9 of
+15 do, and 2 of those 9 are stale pre-fix numbers pending a re-run. See
+`eval/baselines/CHANGELOG.md` and `eval/manifest.yml` for current
+coverage before writing real content into this domain, especially
+`evaluation/reference/current-benchmark-results.md`.
 
 ---
 Pipeline test: 2026-07-11T14:59:07Z
