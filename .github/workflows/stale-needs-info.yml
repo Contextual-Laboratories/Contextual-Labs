@@ -20,7 +20,7 @@ jobs:
   stale:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/stale@v9
+      - uses: actions/stale@5bef64f19d7facfb25b37b414482c7164d639639 # v9
         with:
           days-before-stale: 14
           days-before-close: 7
@@ -30,10 +30,12 @@ jobs:
           days-before-pr-stale: -1
           days-before-pr-close: -1
           stale-issue-message: >
-            This issue has been marked as stale because it's been 14 days
-            since we requested more information and haven't received a
-            response. If you're still experiencing this, please reply with
-            the requested details — otherwise this will close in 7 days.
+            Circling back — it's been 14 days since we asked for more info
+            and haven't heard back. Still hitting this? Reply with the
+            details above and we'll pick it back up. Otherwise this'll
+            close in 7 days — not a judgment on the bug, just keeping the
+            tracker honest.
           close-issue-message: >
-            Closing due to lack of response. If you're still experiencing
-            this, please open a new issue with the requested information.
+            Closing this out for now due to no response. If it's still
+            happening, feel free to open a fresh issue with the requested
+            info — happy to take another look.

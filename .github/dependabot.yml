@@ -1,0 +1,13 @@
+version: 2
+updates:
+  # Only ecosystem in this repo — no npm/pip manifests exist, only the 4
+  # actions used across its workflows (checkout x2, setup-node, stale).
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    cooldown:
+      default-days: 10
+      semver-major-days: 14
+      semver-minor-days: 10
+      semver-patch-days: 7
