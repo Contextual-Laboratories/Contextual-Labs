@@ -1,6 +1,7 @@
-<div align="center">
-  <img src=".github/assets/logo-wordmark.png" alt="Contextual Labs" width="300">
-</div>
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset=".github/assets/logo-wordmark-dark.png">
+  <img src=".github/assets/logo-wordmark-light.png" alt="Contextual Labs" width="100%">
+</picture>
 
 <p align="center"><em>Your AI's memory.</em></p>
 
@@ -21,8 +22,10 @@
   <a href="#install"><b>Install</b></a> ·
   <a href="#what-is-contextual">What is Contextual?</a> ·
   <a href="#documentation">Docs</a> ·
-  <a href="#support">Support</a>
+  <a href="#report-a-bug-or-request-a-feature">Support</a>
 </p>
+
+<p align="center"><code>LOCAL</code> · <code>SECURE</code> · <code>UNIVERSAL</code></p>
 
 <br>
 
@@ -36,10 +39,14 @@ place to report bugs or request features. It is proprietary, closed-source
 software — this repository does not contain, and will never contain, the
 engine's source code.
 
-- **Time to first index** — ~5 min for 50k LOC
-- **Package size** — ~0.8 GB, single static install
-- **Code sent to a server** — 0 bytes, 100% local inference
-- **Median recall latency** — ~94 ms
+<table>
+<tr>
+<td align="center" width="25%"><b>~5 min</b><br><sub>to index 50k LOC</sub></td>
+<td align="center" width="25%"><b>~0.8 GB</b><br><sub>single static install</sub></td>
+<td align="center" width="25%"><b>0 bytes</b><br><sub>of code sent to a server</sub></td>
+<td align="center" width="25%"><b>~94 ms</b><br><sub>median recall latency</sub></td>
+</tr>
+</table>
 
 ## Install
 
@@ -71,31 +78,64 @@ MCP server that build a structural + semantic + temporal understanding of a
 codebase on-device, then serve it to whatever agent is asking. No code ever
 leaves the machine.
 
-- **Structural** — call graphs, class hierarchies, and dependency edges, not just text matches
-- **Semantic** — code-specialized embeddings for meaning-aware search, not keyword grep
-- **Temporal** — git-history-aware, so "what did this used to do" is answerable, not just "what does it do now"
+<table>
+<tr>
+<td width="33%" valign="top">
+<b>Structural</b>
+<br><br>
+Call graphs, class hierarchies, and dependency edges — not just text matches.
+</td>
+<td width="33%" valign="top">
+<b>Semantic</b>
+<br><br>
+Code-specialized embeddings for meaning-aware search — not keyword grep.
+</td>
+<td width="33%" valign="top">
+<b>Temporal</b>
+<br><br>
+Git-history-aware, so "what did this used to do" is answerable — not just "what does it do now."
+</td>
+</tr>
+</table>
+
+Use it for onboarding onto an unfamiliar codebase, keeping an AI agent
+grounded in a large monorepo, code review context, or any workflow where
+"the model guessed" isn't good enough.
+
+```mermaid
+%%{init: {'theme':'neutral'}}%%
+flowchart LR
+    A[Your repository] --> B["contextual index<br/>local, on-device"]
+    B --> C[MCP server]
+    C --> D["AI client<br/>Claude Code · Cursor · Windsurf · ..."]
+```
 
 ## Documentation
 
-Docs are organized by product surface, each following the
-[Diátaxis](https://diataxis.fr/) framework (tutorials, how-to guides,
-reference, explanation):
+Full docs: [contextuallabs.dev/docs](https://contextuallabs.dev/docs) — or
+browse them directly in this repo:
 
 - [`docs/cli/`](docs/cli/) — the Python CLI
 - [`docs/mcp-server/`](docs/mcp-server/) — the MCP server and its tools
 - [`docs/web-dashboard/`](docs/web-dashboard/) — the web dashboard
-- [`docs/concepts/`](docs/concepts/) — cross-cutting architecture/concepts
+- [`docs/concepts/`](docs/concepts/) — architecture and cross-cutting concepts
 - [`docs/account/`](docs/account/) — licensing, trial, device management
 - [`docs/changelog/`](docs/changelog/) — release notes
 
-This repository is a published mirror, not the authoring source — docs are
-written once upstream and synced here automatically. See each folder's
-`README.md` for what belongs where.
+## Report a bug or request a feature
 
-## Support
+GitHub Issues is the official channel for bug reports, docs feedback, and
+feature requests. Contextual is closed-source, proprietary software, so this
+isn't a place for code contributions — it's where the community side of this
+project actually lives: tell us what's broken, what's missing, or what you'd
+like to see.
 
-- **Docs feedback, product bugs, feature requests:** [GitHub Issues](../../issues) — pick the template that matches.
-- **Everything else:** [team@contextuallabs.dev](mailto:team@contextuallabs.dev)
+[**Open an issue**](../../issues/new/choose) and pick the template that
+matches. Typical first response is 1–3 business days — see
+[`SUPPORT.md`](SUPPORT.md) for the full detail, and
+[`SECURITY.md`](SECURITY.md) to report a vulnerability privately instead.
+
+For anything else: [team@contextuallabs.dev](mailto:team@contextuallabs.dev)
 
 ## License
 
