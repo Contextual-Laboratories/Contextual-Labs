@@ -26,5 +26,5 @@ workspace's.
 
 ## See also
 
-- `cli/reference/config/config/config-reset`, `cli/reference/config/config`.
+- `cli/reference/config/config-reset`, `cli/reference/config/config`.
 - `configuration/explanation/config-precedence`.

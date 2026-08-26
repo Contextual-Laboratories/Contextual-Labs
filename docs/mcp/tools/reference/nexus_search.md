@@ -2,7 +2,7 @@
 title: "nexus_search"
 domain: mcp-tools
 category: reference
-tldr: "nexus_search(query, depth, intent, limit, include_code, gcf, workspace) — one call combining semantic search with graph traversal, returning enriched nodes with code, structural edges, authorship, and temporal context."
+tldr: "nexus_search(query, depth, limit, include_code, gcf, workspace) — one call combining semantic search with graph traversal, returning enriched nodes with code, structural edges, authorship, and temporal context."
 order: 2
 ---
 
@@ -18,8 +18,6 @@ in one round trip, with no prior `entity_id` required.
   name.
 - `depth` (integer, 1–5, default 2) — BFS structural-edge hops from the
   seed nodes.
-- `intent` (`"code"` | `"decisions"` | `"mixed"`, default `"code"`) —
-  unrecognized values fall back to `"code"`.
 - `limit` (integer, 1–50, default 15) — max nodes after diversity
   selection.
 - `include_code` (boolean, default false) — include full `code_text`

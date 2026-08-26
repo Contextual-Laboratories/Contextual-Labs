@@ -38,7 +38,7 @@ contextual workspace list
 
 <Terminal lines={[
   {command: "contextual workspace list"},
-  {output: "NAME       PATH                        LAST INDEXED\napi-core   /Users/you/dev/api-core    2026-07-22 09:41 UTC\ndocs-site  /Users/you/dev/docs-site   2026-07-22 09:52 UTC", muted: true}
+  {output: "name       folder      id            last indexed\napi-core   api-core    a1b2c3d4e5f6  2026-07-22 09:41 UTC\ndocs-site  docs-site   9f8e7d6c5b4a  2026-07-22 09:52 UTC", muted: true}
 ]} />
 
 ## 4. Asking about a specific workspace

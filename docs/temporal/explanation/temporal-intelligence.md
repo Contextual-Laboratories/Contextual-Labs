@@ -23,11 +23,9 @@ like as of a past commit or timestamp.
 Attribution comes from actually running `git blame` (first-parent,
 whitespace-ignoring) as a native subprocess per file, with an enforced
 timeout, and caching the result. This is deliberately not an in-process
-git library call — an earlier in-process approach was tried and reverted
-after it caused a multi-hour hang on a large real-world repository, with
-no way to kill a stuck native thread from the timeout logic. A subprocess
-can be killed outright if it overruns; that reliability trade was judged
-worth more than the extra process-spawn overhead.
+git library call: a subprocess can be killed outright if it overruns,
+which an in-process call cannot — a reliability trade judged worth more
+than the extra process-spawn overhead.
 
 `.git-blame-ignore-revs` is auto-detected at your repo root and honored —
 if you use it to exclude a mass-reformat commit from blame attribution,

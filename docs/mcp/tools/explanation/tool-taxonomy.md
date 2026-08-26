@@ -2,12 +2,12 @@
 title: "Tool taxonomy — the five groups, and when to reach for which"
 domain: mcp-tools
 category: explanation
-tldr: 22 tools across five groups — Search & Retrieval, System, Temporal & Decisions, Knowledge Graph, and Co-change — each answering a genuinely different kind of question.
+tldr: 24 tools across five groups — Search & Retrieval, System, Temporal & Decisions, Knowledge Graph, and Co-change — each answering a genuinely different kind of question.
 order: 1
 ---
 
 <Callout variant="tldr">
-Contextual's 22 MCP tools split into five groups by the kind of
+Contextual's 24 MCP tools split into five groups by the kind of
 question they answer, not by which subsystem implements them. Reaching
 for the right group first saves a chain of unnecessary calls.
 </Callout>
@@ -18,15 +18,17 @@ for the right group first saves a chain of unnecessary calls.
 `get_git_diff` — "find and read." Start here for any question about
 what code exists, what it says, or what recently changed.
 
-## System (2)
+## System (4)
 
-`get_doctor`, `get_stats` — "is Contextual itself healthy." Reach for
-these when something seems broken or you want to know how fresh/large
-the index is, not when you're asking about the codebase's own content.
+`get_doctor`, `get_stats`, `get_telemetry`, `diagnose_issue` — "is
+Contextual itself healthy." Reach for these when something seems
+broken or you want to know how fresh/large the index is or how it's
+been performing, not when you're asking about the codebase's own
+content.
 
 ## Temporal & Decisions (6)
 
-`decision_create`, `decision_accept`, `decision_supersede`,
+`decision_create`, `decision_update`, `decision_supersede`,
 `decision_list`, `decision_search`, `get_temporal_context` —
 architectural decision records and per-entity history (blame, commits,
 change velocity).

@@ -8,17 +8,16 @@ documentation and stays here.
 
 The authoring source for Contextual's public documentation. Written here,
 in the same PR as the code change that made a doc update necessary.
-Synced automatically to the public `Contextual-Labs` repo on every merge
-to main that touches this folder — never edited by hand over there, and
-never touched directly by anyone outside this repo.
+On every push to `main` that touches this folder, the whole tree syncs
+automatically to `Contextual-Web`, which builds and serves the public
+docs website and also mirrors this folder on to `Contextual-Labs`
+(receive-only there) — never edited by hand in either downstream repo.
 
 `Contextual-Labs` is the published, publicly-browsable copy and also
 where GitHub Issues lives as the real customer support/bug-report
-channel. `Contextual-Web`'s marketing site renders the final docs website
-by pulling from `Contextual-Labs` at build time. One-way flow: author
-here → publish on Labs → render on Web.
+channel.
 
-## Structure (restructured 2026-07-25 — see `Teams/Operations/docs-domain-restructure-2026-07-25.md`)
+## Structure
 
 18 top-level domains, each following Diátaxis internally
 (`tutorials/how-to/reference/explanation`, plus two cross-cutting,
@@ -33,7 +32,7 @@ getting-started/    site map, architecture overview, guided tour, wayfinding
 cli/                 reference/{general,config,client,mcp,workspace,skill}/, + tutorials, how-to, explanation
 mcp/
   server/            the daemon: lifecycle, hot-reload, access control
-  tools/             all 22 MCP tools: reference, how-to, explanation, tutorials
+  tools/             all 24 MCP tools: reference, how-to, explanation, tutorials
 indexing/            chunking, embedding, graph extraction, blame, sizing, language support
 retrieval/           hybrid BM25+dense+trigram ranking, MMR diversity
 graph/               entities, predicates, confidence tiers, CHA/RTA
@@ -106,34 +105,15 @@ related: string[]      # optional. relative paths for "see also" links.
 
 `<Callout variant="tldr" | "note" | "warning">` and
 `<Terminal lines={[...]} />` are both real, live MDX components — usable
-directly in this markdown with no per-file import. See
-`Teams/Memory/docs-authoring-components-2026-07-23.md` for the full
-component contract.
+directly in this markdown with no per-file import.
 
 ## Status
 
-**Structural scaffold complete, 2026-07-25**: every domain/subdomain
-above exists on disk with real frontmatter (title, domain, category,
-tldr) on every page. Pages carried over from the prior 6-domain tree
-(`cli/`, `mcp-server/`, `engine/`, `web-dashboard/`) are real, previously
--authored content, moved and re-pointed — not stubs. Net-new pages (the
-six former-`engine/`-subsystem domains' extra depth, all 11
-`integrations/reference/` pages, `observability/`'s OTel-specific pages,
-`getting-started/`'s wayfinding page) are structural placeholders —
-real title/domain/category/tldr, body content not yet written. See
-`Teams/Operations/docs-domain-restructure-2026-07-25.md` for the full
-before/after page manifest and what's pending Web's confirmation before
-the real content-authoring pass begins.
-
-**`evaluation/` domain added, 2026-07-31**: scaffold-only, same convention
-as above — real title/domain/category/tldr on every page, bodies not yet
-written. Deliberately held back from a real content-authoring pass until
-every golden repo in `eval/manifest.yml` has a verified baseline on the
-`m2_air_8gb` (primary target) hardware profile; as of this date only 9 of
-15 do, and 2 of those 9 are stale pre-fix numbers pending a re-run. See
+Every domain/subdomain exists on disk with real frontmatter (title,
+domain, category, tldr) on every page. Most pages carry real, verified
+content; a page still awaiting its content-authoring pass is marked
+inline with a "structural placeholder" note rather than silently
+shipping an empty page. `evaluation/` is held back deliberately until
+every golden repo has a verified benchmark baseline — see
 `eval/baselines/CHANGELOG.md` and `eval/manifest.yml` for current
-coverage before writing real content into this domain, especially
-`evaluation/reference/current-benchmark-results.md`.
-
----
-Pipeline test: 2026-07-11T14:59:07Z
+coverage before writing real content into that domain.

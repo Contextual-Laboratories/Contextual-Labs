@@ -28,4 +28,4 @@ directly rather than pretending to do something.
 
 ## See also
 
-- `cli/reference/client/client/client-rm`, `cli/reference/client/client`.
+- `cli/reference/client/client-rm`, `cli/reference/client/client`.

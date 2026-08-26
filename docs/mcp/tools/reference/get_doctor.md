@@ -28,3 +28,4 @@ Contextual healthy?" Skip it if you only want index statistics — use
 
 - `cli/reference/general/doctor` — the CLI equivalent.
 - `observability/how-to/interpreting-doctor-report`.
+- `mcp/tools/reference/diagnose_issue` — correlates this with recent telemetry into ranked causes.

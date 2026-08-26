@@ -35,7 +35,7 @@ your account).
   mcp, workspace, skill).
 - `mcp/server/` — the background daemon: lifecycle, hot-reload, client
   access control.
-- `mcp/tools/` — all 22 tools your AI client can call, one page each.
+- `mcp/tools/` — all 24 tools your AI client can call, one page each.
 - `integrations/` — connecting, switching, and removing each of the 11
   supported AI clients.
 

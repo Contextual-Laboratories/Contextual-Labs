@@ -58,14 +58,16 @@ a "7-day retention" policy means your index quietly ages out — it
 doesn't.
 </Callout>
 
-## OTel span/log export is opt-in, not on by default
+## OTel span/log export is on by default
 
 Contextual's tracing instrumentation is real (a genuine OpenTelemetry
-SDK, not a stub), but writing spans/logs to the local database tables
-that the retention pruner above manages is off by default — there's
-currently no built-in way to read that data back out, so writing it by
-default would be pure storage cost for no payoff. Turn it on only if
-you're actively debugging and want local trace data to inspect.
+SDK, not a stub), and writing spans/logs to the local database tables
+that the retention pruner above manages (`otel_spans`/`otel_logs`) is
+on by default: `get_telemetry`, `diagnose_issue`, and `contextual
+activity` all read this data back, so it needs to be recording during
+normal use, not just opted into for a one-off debugging session. See
+`observability/how-to/enable-otel-export-for-a-debugging-session` for
+when and why you'd turn it off instead.
 
 ## What gets swept on `contextual uninstall`
 

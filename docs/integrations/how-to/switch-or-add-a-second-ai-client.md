@@ -31,5 +31,5 @@ contextual client rm --claude-code
 
 ## See also
 
-- `cli/reference/client/client`, `cli/reference/client/client/client-rm`.
+- `cli/reference/client/client`, `cli/reference/client/client-rm`.
 - `integrations/tutorials/connecting-an-ai-client`.

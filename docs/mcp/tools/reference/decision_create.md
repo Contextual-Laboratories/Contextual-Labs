@@ -21,7 +21,7 @@ embeds it so `decision_search` can find it later.
 - `authored_by` (string, optional) — author name/identifier.
 - `workspace` (string, optional).
 
-Returns the new `adr_id` in `proposed` status — use `decision_accept`
+Returns the new `adr_id` in `proposed` status — use `decision_update`
 to make it the active decision.
 
 ## When to use it (and when not to)
@@ -32,5 +32,5 @@ first to avoid duplicates.
 
 ## See also
 
-- `mcp/tools/reference/decision_accept`, `mcp/tools/reference/decision_list`.
+- `mcp/tools/reference/decision_update`, `mcp/tools/reference/decision_list`.
 - `mcp/tools/how-to/record-and-track-an-architectural-decision`.

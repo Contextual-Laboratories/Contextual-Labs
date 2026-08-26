@@ -23,6 +23,14 @@ change-velocity, and any linked ADRs, for one entity.
 A high change-velocity result is a real risk signal worth surfacing
 before editing a hot path, not just trivia.
 
+The response also includes `blame_confidence`: `{"degraded": true,
+"reasons": ["shallow_clone"]}` when the workspace is a shallow git
+clone, since blame and commit history can't see past a shallow clone's
+truncation boundary — treat attribution as unverified in that case
+rather than at face value. See
+`temporal/reference/temporal-query-reference` for the full field
+breakdown.
+
 ## When to use it (and when not to)
 
 Call it for authorship/change-frequency questions about a specific

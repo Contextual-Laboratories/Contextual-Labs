@@ -1,7 +1,7 @@
 ---
 title: Interpreting a doctor Report
 domain: observability
-category: observability
+category: how-to
 tldr: "contextual doctor runs seven independent checks — Configuration, Directories, Models, Daemon & Locks, Database, MCP Integration, and Git Integration — each pass/fail with a specific detail line, not a single overall health score."
 order: 1
 ---

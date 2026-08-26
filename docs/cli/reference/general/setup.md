@@ -39,5 +39,5 @@ up under the root/Administrator account instead, and your normal user's
 
 ## See also
 
-- `cli/reference/general/fetch`, `cli/reference/skill`.
+- `cli/reference/general/fetch`, `cli/reference/skill/skill`.
 - `cli/reference/general/uninstall` — the reverse of this command.

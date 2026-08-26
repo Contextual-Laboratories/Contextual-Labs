@@ -26,3 +26,4 @@ actual contents — use `search` or `graph_stats` instead.
 
 - `cli/reference/general/stats` — the CLI equivalent.
 - `mcp/tools/reference/get_doctor`, `mcp/tools/reference/graph_stats`.
+- `mcp/tools/reference/get_telemetry` — usage/activity over time, not a snapshot.

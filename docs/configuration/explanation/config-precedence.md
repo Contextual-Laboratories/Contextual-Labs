@@ -37,5 +37,5 @@ config from your own data.
 
 ## See also
 
-- `cli/reference/config/config`, `cli/reference/config/config/config-reset`.
+- `cli/reference/config/config`, `cli/reference/config/config-reset`.
 - `configuration/how-to/reset-config-to-defaults`.

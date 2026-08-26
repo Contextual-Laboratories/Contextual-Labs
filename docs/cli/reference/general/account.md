@@ -37,4 +37,4 @@ first if not.
 
 ## See also
 
-- `cli/reference/general/login`, `cli/reference/general/deactivate`.
+- `cli/reference/general/login`, `cli/reference/general/logout`.

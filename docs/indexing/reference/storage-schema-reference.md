@@ -17,13 +17,6 @@ full per-workspace LanceDB under `<repo>/.contextual/lancedb` holding
 everything Contextual actually knows about that specific codebase.
 </Callout>
 
-<Callout variant="note">
-Older internal documentation describes a fixed "13-table" schema — that
-count is historical only. The schema has grown considerably since,
-through forward-only migrations, and this page reflects the current
-shape.
-</Callout>
-
 ## Two database roots
 
 - **Global** (`~/.contextual/lancedb`) — `users`, `workspaces`. Small,
@@ -43,7 +36,7 @@ shape.
 | `embedding_cache` / `query_cache` | Content-hash-keyed embedding reuse, and cached query results. |
 | `audit_log` | The tool-call audit trail (which client called which tool, when, with what outcome) — see `observability/reference/logs-and-retention-reference` for its retention window, which is deliberately different from everything else in this list. |
 
-A few additional tables (`terminal_sessions`, `queue`, `swarm`,
+A few additional tables (`queue`, `swarm`,
 `task_force`, `reminders`) support internal/experimental features outside
 the documented MCP tool surface and aren't covered in detail here.
 Enterprise and Teams editions add their own organization/team-scoped
@@ -58,9 +51,9 @@ order and tracked in a JSON version file at
 knows exactly which migrations it's had applied, and a fresh workspace
 runs the full chain from scratch. A schema version bump
 (`SCHEMA_VERSION`, currently `2.0.0`) signals a change significant enough
-to require `contextual index --force` — most recently, the ONNX/fastembed
-embedding migration, since old and new embeddings aren't compatible
-within the same table.
+to require `contextual index --force` — the kind of change where old and
+new data in the same table would no longer be comparable, such as an
+embedding-model change (see `models/explanation/embedding-model-stack`).
 
 ## What this means for you
 

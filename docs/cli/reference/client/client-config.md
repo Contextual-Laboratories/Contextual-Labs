@@ -27,5 +27,5 @@ No arguments or flags.
 
 ## See also
 
-- `cli/reference/client/client/client-list`.
+- `cli/reference/client/client-list`.
 - `mcp/server/explanation/mcp-client-access-control`.

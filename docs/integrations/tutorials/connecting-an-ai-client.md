@@ -73,5 +73,5 @@ isn't the problem.
 
 ## See also
 
-- `cli/reference/client/client`, `cli/reference/client/client/client-rm`, `cli/reference/client/client/client-list`.
+- `cli/reference/client/client`, `cli/reference/client/client-rm`, `cli/reference/client/client-list`.
 - `integrations/how-to/switch-or-add-a-second-ai-client`.

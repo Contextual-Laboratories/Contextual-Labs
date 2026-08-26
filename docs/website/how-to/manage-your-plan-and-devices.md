@@ -29,7 +29,7 @@ disappear if the request fails partway.
 Solo licenses allow one active device at a time, with up to three
 swaps per calendar month (resetting on the 1st for everyone, not on a
 rolling per-user window). Removing a device here is the same action as
-`contextual deactivate` from the terminal — either one frees the slot.
+`contextual logout` from the terminal — either one frees the slot.
 </Callout>
 
 ## Managing billing
@@ -42,4 +42,4 @@ this site directly.
 ## See also
 
 - `website/reference/account-page-reference`.
-- `cli/reference/general/deactivate`.
+- `cli/reference/general/logout`.

@@ -31,4 +31,4 @@ it first with `decision_create`.
 
 ## See also
 
-- `mcp/tools/reference/decision_create`, `mcp/tools/reference/decision_accept`.
+- `mcp/tools/reference/decision_create`, `mcp/tools/reference/decision_update`.

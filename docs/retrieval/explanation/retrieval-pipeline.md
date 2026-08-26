@@ -49,14 +49,12 @@ the most weight in the fusion, BM25 next, trigram least — reflecting that
 semantic similarity is usually the strongest single signal for a natural-
 language query, with the other two catching what it misses.
 
-## No reranking stage — this was a deliberate removal, not an oversight
+## No reranking stage
 
-An earlier version of Contextual included a cross-encoder reranking pass
-after fusion. It was evaluated and removed: it added real latency for no
-measured precision benefit on the query patterns Contextual is actually
-built for. Current ranking stops at RRF fusion plus the diversity pass
-below — if you've used a retrieval system elsewhere that reranks, don't
-assume Contextual has an equivalent stage.
+Ranking stops at RRF fusion plus the diversity pass below — there is no
+cross-encoder reranking stage. If you've used a retrieval system
+elsewhere that reranks, don't assume Contextual has an equivalent stage:
+fusion plus MMR diversity selection is the complete ranking pipeline.
 
 ## Diversity, not just relevance
 

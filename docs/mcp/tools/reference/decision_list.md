@@ -14,17 +14,19 @@ supersession links — without a semantic search step.
 ## Parameters
 
 - `status` (string, optional) — filter to one status, e.g.
-  `"proposed"`, `"accepted"`, `"superseded"`.
+  `"proposed"`, `"accepted"`, `"superseded"`, `"deprecated"`. With no
+  filter, every status is returned — deprecated ADRs are excluded from
+  `decision_search` but still appear here.
 - `limit` (integer, 1–100, default 20).
 - `workspace` (string, optional).
 
 ## When to use it (and when not to)
 
 Call it for "what decisions have been made" or to get an `adr_id`
-before calling `decision_accept`/`decision_supersede`. Skip it if you
+before calling `decision_update`/`decision_supersede`. Skip it if you
 need to find an ADR by topic or content — use `decision_search`
 instead.
 
 ## See also
 
-- `mcp/tools/reference/decision_search`, `mcp/tools/reference/decision_accept`.
+- `mcp/tools/reference/decision_search`, `mcp/tools/reference/decision_update`.

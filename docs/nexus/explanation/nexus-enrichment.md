@@ -40,6 +40,13 @@ flowchart LR
 3. From those seeds, a structural breadth-first traversal walks outward
    through the graph's real relationships (calls, imports, inherits, and
    the rest of the taxonomy in `graph/explanation/the-knowledge-graph`).
+   This traversal is forward/outbound only — what each seed calls or
+   references — so a one-hop pass in the opposite direction (who calls
+   each seed) is added on top, appended after the forward results rather
+   than merged in with equal weight. Without it, a query like "everything
+   that calls X" can return zero relevant nodes even when X is itself the
+   top semantic match, because nothing in a purely forward pool ever
+   looks backward from the seed.
 4. Every node picked up along the way gets its temporal context attached
    — recent commits, blame attribution, and a current staleness score
    (see `temporal/explanation/temporal-intelligence`).

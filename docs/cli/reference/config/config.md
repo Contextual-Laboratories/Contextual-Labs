@@ -28,6 +28,6 @@ contextual config [--global]
 
 ## See also
 
-- `cli/reference/config/config/config-reset`.
+- `cli/reference/config/config-reset`.
 - `configuration/explanation/config-precedence` for how global and workspace
   config interact.
