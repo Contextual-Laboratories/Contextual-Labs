@@ -1,7 +1,10 @@
 blank_issues_enabled: false
 contact_links:
+  - name: Have a question, not a bug?
+    url: https://github.com/Contextual-Laboratories/Contextual-Labs/discussions/categories/q-a
+    about: Use Q&A in Discussions instead — keeps the bug tracker focused on actual bugs.
   - name: Security vulnerability
-    url: https://github.com/Contextual-Laboratory/Contextual-Labs/security/policy
+    url: https://github.com/Contextual-Laboratories/Contextual-Labs/security/policy
     about: Please report vulnerabilities privately — see SECURITY.md, do not open a public issue.
   - name: Account, billing, or other private support
     url: mailto:team@contextuallabs.dev

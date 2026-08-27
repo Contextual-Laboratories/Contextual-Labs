@@ -12,6 +12,7 @@
 </p>
 
 <p align="center">
+  <img alt="Status" src="https://img.shields.io/badge/status-beta%20launch-000000?style=flat-square">
   <a href="https://contextuallabs.dev"><img alt="Website" src="https://img.shields.io/badge/site-contextuallabs.dev-000000?style=flat-square"></a>
   <a href="https://contextuallabs.dev/docs"><img alt="Docs" src="https://img.shields.io/badge/docs-read-000000?style=flat-square"></a>
   <a href="https://github.com/Contextual-Laboratories/Contextual-Labs/releases"><img alt="Latest Release" src="https://img.shields.io/github/v/release/Contextual-Laboratories/Contextual-Labs?include_prereleases&style=flat-square&color=000000&label=embedding%20model"></a>

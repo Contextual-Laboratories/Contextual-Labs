@@ -1,7 +1,7 @@
 name: Lint Markdown
 
-# Zero third-party Actions, deliberately — same convention as
-# dispatch-to-web.yml. markdownlint-cli2 is installed via npm at run time
+# Zero third-party Actions, deliberately — same convention as every
+# workflow in this repo. markdownlint-cli2 is installed via npm at run time
 # (official actions/checkout + actions/setup-node only), not invoked
 # through a third-party marketplace Action.
 
@@ -9,6 +9,9 @@ on:
   pull_request:
   push:
     branches: [main]
+
+permissions:
+  contents: read
 
 jobs:
   lint:

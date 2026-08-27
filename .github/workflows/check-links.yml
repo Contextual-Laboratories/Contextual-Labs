@@ -1,13 +1,16 @@
 name: Check Links
 
-# Zero third-party Actions, deliberately — same convention as
-# dispatch-to-web.yml. Broken-link checking is a plain curl loop over
+# Zero third-party Actions, deliberately — same convention as every
+# workflow in this repo. Broken-link checking is a plain curl loop over
 # links extracted from markdown, not a third-party marketplace Action.
 
 on:
   schedule:
     - cron: "0 0 * * 1" # weekly, Monday midnight UTC
   workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
   link-check:
