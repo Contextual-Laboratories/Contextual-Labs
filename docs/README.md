@@ -1,31 +1,14 @@
 # docs/Public
 
-This is the **only** part of `Contextual/docs/` that ever leaves this
-repo. Everything else in `docs/` is private, internal engineering
-documentation and stays here.
-
-## What this is
-
-The authoring source for Contextual's public documentation. Written here,
-in the same PR as the code change that made a doc update necessary.
-On every push to `main` that touches this folder, the whole tree syncs
-automatically to `Contextual-Web`, which builds and serves the public
-docs website and also mirrors this folder on to `Contextual-Labs`
-(receive-only there) — never edited by hand in either downstream repo.
-
-`Contextual-Labs` is the published, publicly-browsable copy and also
-where GitHub Issues lives as the real customer support/bug-report
-channel.
+The authoring source for Contextual's public documentation — the
+reference, tutorial, how-to, and explanation content that ships on the
+public docs site.
 
 ## Structure
 
 18 top-level domains, each following Diátaxis internally
 (`tutorials/how-to/reference/explanation`, plus two cross-cutting,
-non-Diátaxis sections below). Replaces the prior 6-domain shape
-(`cli/`, `mcp-server/`, `engine/`, `account/`, `web-dashboard/`,
-`changelog/`) — `engine/` and `mcp-server/` are fully dissolved,
-`web-dashboard/` is renamed, nothing else from the old tree survives
-under its old name.
+non-Diátaxis sections below).
 
 ```
 getting-started/    site map, architecture overview, guided tour, wayfinding
@@ -74,11 +57,7 @@ Root-level `meta.json` carries a single `docsVersion` field — the engine
 version this docs tree has actually been verified against, not
 necessarily whatever's newest on PyPI (PyPI can run ahead of doc
 verification). Bump it by hand whenever a content-authoring pass is
-checked against a release. Web's `fetch-docs-content.mjs` stages the
-whole tree already (see `generate-docs-pages.mjs`'s `.md`-only filter —
-this file is skipped by the page walk, so it's safe as a sibling to the
-domain folders), so no separate sync step is needed for it to reach
-`Contextual-Labs`.
+checked against a release.
 
 ## Page frontmatter
 
@@ -106,14 +85,3 @@ related: string[]      # optional. relative paths for "see also" links.
 `<Callout variant="tldr" | "note" | "warning">` and
 `<Terminal lines={[...]} />` are both real, live MDX components — usable
 directly in this markdown with no per-file import.
-
-## Status
-
-Every domain/subdomain exists on disk with real frontmatter (title,
-domain, category, tldr) on every page. Most pages carry real, verified
-content; a page still awaiting its content-authoring pass is marked
-inline with a "structural placeholder" note rather than silently
-shipping an empty page. `evaluation/` is held back deliberately until
-every golden repo has a verified benchmark baseline — see
-`eval/baselines/CHANGELOG.md` and `eval/manifest.yml` for current
-coverage before writing real content into that domain.

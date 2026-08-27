@@ -39,10 +39,13 @@ See `models/explanation/embedding-model-stack`.
 
 **Telemetry, by default.** Contextual's tracing instrumentation is real
 OpenTelemetry, not a stub — but its export target is your own local
-LanceDB tables, not an external collector, and writing that data at all
-is opt-in (off by default) since nothing currently reads it back. There
-is no telemetry egress to Contextual Labs or anyone else, on by default
-or otherwise.
+LanceDB tables (`otel_spans`, `otel_logs`), not an external collector.
+This local export is on by default (`export_to_lancedb`), since
+`get_telemetry`, `diagnose_issue`, and `contextual activity` all depend
+on it to answer questions about your own daemon's behavior — see
+`observability/explanation/how-tracing-and-logging-work`. There is no
+telemetry egress to Contextual Labs or anyone else, regardless of this
+setting.
 
 ## What does make a network call, and why
 
