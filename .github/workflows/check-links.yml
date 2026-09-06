@@ -32,6 +32,16 @@ jobs:
               *localhost*|*example.com*|*127.0.0.1*)
                 continue
                 ;;
+              *://contextuallabs.dev*|*://www.contextuallabs.dev*)
+                # Confirmed 2026-09-06: contextuallabs.dev is up and returns
+                # 200 from ordinary clients, but this runner's IP range gets
+                # a 403 from Cloudflare/WAF on every run (verified live, not
+                # a UA issue — same curl call succeeds from a non-Actions
+                # network). That's a Cloudflare-zone config on the site's
+                # infra, out of this repo's reach — skip rather than let a
+                # permanent false positive mask real broken-link signal.
+                continue
+                ;;
             esac
 
             code=$(curl -s -o /dev/null -w "%{http_code}" -L --max-time 20 --retry 2 --retry-delay 3 "$url" || echo "000")

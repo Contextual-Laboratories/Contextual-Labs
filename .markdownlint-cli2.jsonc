@@ -6,7 +6,12 @@
     "default": true,
     "MD013": false, // line length — synced docs contain long generated lines
     "MD033": false, // inline HTML — some docs content embeds raw HTML
-    "MD041": false // first line must be a top-level heading — not true for every synced page
+    "MD041": false, // first line must be a top-level heading — not true for every synced page
+    "MD040": false, // fenced-code-language — upstream fences often omit a language
+    "MD060": false, // table-column-style — upstream tables don't follow this spacing convention
+    "MD032": false, // blanks-around-lists — several upstream pages violate this
+    "MD036": false, // no-emphasis-as-heading — upstream site-map.md uses bold as pseudo-headings
+    "MD025": false // single-title/single-h1 — at least one upstream reference page has two H1s
   },
   "globs": ["**/*.md"],
   "ignores": ["node_modules/**"]
