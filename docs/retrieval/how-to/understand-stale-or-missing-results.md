@@ -2,7 +2,7 @@
 title: Understand Why a Query Returned Stale or Missing Results
 domain: retrieval
 category: how-to
-tldr: A missing or stale-looking result almost always traces to one of three causes — the index hasn't caught up with a recent change, the entity genuinely isn't in the graph, or a high staleness score is correctly flagging content that's likely out of date.
+tldr: A missing or stale-looking result almost always traces to one of four causes — the index hasn't caught up with a recent change, Deep Index is still running in the background, the entity genuinely isn't in the graph, or a high staleness score is correctly flagging content that's likely out of date.
 order: 6
 related:
   - indexing/explanation/incremental-vs-scheduled-indexing.md
@@ -29,7 +29,18 @@ the old version of that file.
 **Fix**: run `contextual index --incremental` and try again. This is
 cheap and safe to run whenever you're unsure.
 
-## Cause 2 — the entity genuinely isn't in the graph
+## Cause 2 — Deep Index is still running in the background
+
+Right after a fresh or forced `contextual index`, the fast Dynamic Index
+tier (graph, blame, keyword search) is queryable before Deep Index
+(embeddings) finishes — see `indexing/explanation/how-indexing-works`.
+During that window, `search`/`nexus_search` results come from keyword
+matching rather than full semantic ranking, and the response carries a
+`DYNAMIC_INDEX_ONLY` entry in its stale warnings. This isn't staleness in
+the usual sense — it resolves on its own once Deep Index completes; check
+`contextual index --status` to see how far along it is.
+
+## Cause 3 — the entity genuinely isn't in the graph
 
 For graph-specific tools (`graph_traverse`, `graph_impact`,
 `graph_get_entity_callers`, and others), Contextual deliberately
@@ -39,7 +50,7 @@ exist in the index at all" — see
 distinction and why it matters. If you're seeing an explicit "not found"
 message rather than an empty result, that's this cause, not staleness.
 
-## Cause 3 — the result is stale, and Contextual is telling you so
+## Cause 4 — the result is stale, and Contextual is telling you so
 
 Every entity the temporal layer touches carries a staleness score — how
 likely it is to be out of date, based on how often it normally changes
@@ -55,13 +66,15 @@ as intended rather than something to fix.
 1. Did you (or your editor) actually save the change, and was the
    watcher/daemon running when you did? → run `contextual index
    --incremental`.
-2. Is this a graph query returning an explicit "not found" rather than
+2. Does the response's stale warnings include `DYNAMIC_INDEX_ONLY`? →
+   Deep Index is still running; check `contextual index --status`.
+3. Is this a graph query returning an explicit "not found" rather than
    an empty result? → see `troubleshooting/entity-not-found`.
-3. Is the result present but flagged with high staleness? → that's a
+4. Is the result present but flagged with high staleness? → that's a
    signal, not a failure — treat it the way you'd treat a stale-review
    nudge.
-4. None of the above? Run `contextual doctor` and check the
-   **Database** and **Daemon & Locks** lines — see
-   `observability/how-to/interpreting-doctor-report`. An unhealthy index
-   or a daemon serving a different workspace than you expect are the
-   next most common causes.
+5. None of the above? Run `contextual doctor` and check the
+   **Database**, **Daemon & Locks**, and **Indexing Job** lines — see
+   `observability/how-to/interpreting-doctor-report`. An unhealthy index,
+   a crashed indexing job, or a daemon serving a different workspace than
+   you expect are the next most common causes.

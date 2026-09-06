@@ -2,7 +2,7 @@
 title: Speed Up or Debug a Slow Index Run
 domain: indexing
 category: how-to
-tldr: Use --incremental instead of a full re-index whenever you can, check .contextualignore for files you don't actually need indexed, and read the stage names in the index output to see which of the six pipeline stages is actually slow.
+tldr: Use --incremental instead of a full re-index whenever you can, check .contextualignore for files you don't actually need indexed, and read the stage names in `contextual index --status` to see whether Dynamic Index or Deep Index is actually the slow one.
 order: 2
 related:
   - indexing/explanation/how-indexing-works.md
@@ -46,45 +46,47 @@ value. Check `.contextualignore` — see
 the files actually bloating your run are covered by a pattern there or in
 `.gitignore` (both are honored).
 
-## Third: figure out which stage is actually slow
+## Third: figure out which tier is actually slow
 
-A full index runs six stages in sequence — model warmup, discovery,
-blame extraction, graph extraction, chunk+embed, then backfill and search
--index rebuild (see `indexing/explanation/how-indexing-works` for what each
-one does). The CLI reports stage transitions as it runs, so before
-assuming "indexing" in general is slow, look at *which* stage is taking
-the time:
+A full index runs as a background job in two tiers — Dynamic Index
+(discovery, blame, graph extraction, keyword search) then Deep Index
+(chunk + embed, backfill, search-index rebuild) — see
+`indexing/explanation/how-indexing-works` for what each one does. Run
+`contextual index --status` to see which tier is currently running and
+how far along it is, rather than guessing from wall-clock time alone:
 
-- Slow at **blame extraction**: usually a very deep git history, or a
-  huge number of files needing fresh blame (no cache hit yet). This
-  should get faster on the next run once the blame cache is warm.
-- Slow at **graph extraction**: proportional to file count and language
-  mix — languages with full structural resolution (see
+- Slow during **Dynamic Index** (blame/graph extraction): usually a very
+  deep git history, or a huge number of files needing fresh blame (no
+  cache hit yet) — this should get faster on the next run once the blame
+  cache is warm. Graph extraction cost is proportional to file count and
+  language mix — languages with full structural resolution (see
   `indexing/reference/language-support-matrix`) cost more here than
-  chunk-only languages.
-- Slow at **chunk + embed**: this is the CPU-bound stage — see
-  `indexing/how-to/size-your-machine-before-indexing-a-large-repo` for what
-  actually drives its cost. Embedding uses every available core by
-  default; if the machine is also doing something else CPU-heavy at the
-  same time, this stage is the one that'll feel it.
-- Slow at **backfill or search-index rebuild**: less common; if this
-  stage specifically is the outlier on a repeat run, that's worth
-  reporting rather than assuming it's expected.
+  chunk-only languages. Graph/blame/keyword search are already usable
+  once this tier finishes, even if Deep Index is still running.
+- Slow during **Deep Index** (chunk + embed): this is the CPU-bound
+  tier — see `indexing/how-to/size-your-machine-before-indexing-a-large-repo`
+  for what actually drives its cost. Embedding uses every available core
+  by default; if the machine is also doing something else CPU-heavy at
+  the same time, this is the tier that'll feel it. Until it finishes,
+  `search`/`nexus_search` transparently fall back to Dynamic Index's
+  keyword layer rather than returning incomplete semantic results — see
+  `retrieval/how-to/understand-stale-or-missing-results`.
 
 <Callout variant="note">
-Stage order is not "chunk, then embed, then extract the graph" — graph
-and blame extraction run *before* chunking and embedding. If you're
-timing stages against an assumption about ordering, check
-`indexing/explanation/how-indexing-works` first; the actual order is
-specifically the opposite of what you'd guess.
+Within Dynamic Index, stage order is not "chunk, then embed, then extract
+the graph" — graph and blame extraction run *before* Deep Index's
+chunking and embedding. If you're timing stages against an assumption
+about ordering, check `indexing/explanation/how-indexing-works` first;
+the actual order is specifically the opposite of what you'd guess.
 </Callout>
 
 ## If it's still unexpectedly slow
 
 Run `contextual doctor` first — see
 `observability/how-to/interpreting-doctor-report` — to rule out an
-unhealthy daemon or a missing model download inflating the warmup stage.
-If everything there checks out and one stage is still disproportionately
+unhealthy daemon, a missing model download, or a crashed indexing job
+(the Indexing Job check) inflating what looks like a slow run. If
+everything there checks out and one tier is still disproportionately
 slow relative to your repository's size, that's worth reporting with the
-stage name and rough file/repo size, since "slow" without a stage name is
-hard to act on.
+tier name (from `contextual index --status`) and rough file/repo size,
+since "slow" without a tier name is hard to act on.

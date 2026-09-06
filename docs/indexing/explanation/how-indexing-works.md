@@ -2,7 +2,7 @@
 title: How Indexing Actually Works
 domain: indexing
 category: explanation
-tldr: A full index runs blame history and graph extraction first, then chunks and embeds your files, then backfills graph vectors and rebuilds search — not the "chunk, embed, extract" order you'd naively guess.
+tldr: A full index runs as a background job in two tiers — a fast Dynamic Index (discovery, blame, graph, keyword search) that makes your repo queryable within seconds, followed by a Deep Index (chunk + embed) that fills in semantic search once it finishes.
 order: 2
 related:
   - getting-started/explanation/architecture-overview.md
@@ -12,44 +12,63 @@ related:
 ---
 
 <Callout variant="tldr">
-`contextual index` runs six stages in a fixed order: model warmup, file
-discovery, blame history extraction, dependency-graph extraction, chunking
-+ embedding, then a backfill + search-index rebuild. Graph extraction runs
-*before* embedding, not after — a deliberate reorder, not an accident.
+`contextual index` runs as a detached background job with two tiers.
+**Dynamic Index** — file discovery, blame, dependency-graph extraction,
+and keyword/BM25 search — commits first and needs no embedding model.
+**Deep Index** — chunking and embedding — runs after it, in the
+background, and is the only tier that needs the model. Graph, blame, and
+keyword search are usable the moment Dynamic Index finishes; semantic
+search fills in once Deep Index completes.
 </Callout>
 
-## The six stages, in the order they actually run
+## The two tiers, in the order they actually run
 
 ```mermaid
 flowchart TD
-    A[Warm up the embedding model] --> B[Discover files]
-    B --> C["Blame pre-pass\n(git blame per file, cached)"]
-    C --> D["Graph extraction\n(entities + relationships, blame-enriched inline)"]
-    D --> E["Chunk + embed\n(tree-sitter split, local ONNX embed, write to LanceDB)"]
-    E --> F["Backfill\n(graph node vectors, chunk-vector reuse)"]
-    F --> G["Rebuild search index\n(BM25 + trigram FTS)"]
+    subgraph dyn["Dynamic Index (no model needed)"]
+        A[Discover files] --> B["Blame + graph extraction\n(entities + relationships, blame-enriched inline)"]
+        B --> C["CHA/RTA polymorphic-dispatch pass\n+ graph compaction"]
+        C --> D["Build keyword/BM25 search index\n(lexical_files)"]
+    end
+    D --> E
+    subgraph deep["Deep Index (needs the embedding model)"]
+        E["Chunk + embed\n(tree-sitter split, local ONNX embed, write to LanceDB)"] --> F["Backfill\n(graph node vectors, chunk-vector reuse)"]
+        F --> G["Rebuild search index\n(code_chunks/doc_chunks FTS)"]
+    end
 ```
 
-**1. Model warmup.** The local embedding model loads once, up front, so its
-5-10s cold-start cost is paid before any per-file timing starts — not
-buried inside the first embed call where it would skew per-batch metrics.
+### Dynamic Index — commits first, no model required
 
-**2. File discovery.** A recursive walk of your repository, filtered by
+**1. File discovery.** A recursive walk of your repository, filtered by
 `.contextualignore` and `.gitignore` (see
 `indexing/reference/contextualignore-reference`). Runs in a thread pool so it
 doesn't block anything else.
 
-**3. Blame pre-pass.** For every file about to be indexed, Contextual runs
-`git blame` as a native subprocess (first-parent, with an enforced timeout)
-and caches the result. This has no dependency on graph or embedding
-output — it only needs the file paths and git history.
-
-**4. Graph extraction.** Tree-sitter parses each file's AST and extracts
-entities (functions, classes, imports, ...) and structural relationships
-(calls, inherits, imports, ...) into the dependency graph. Each entity is
-enriched with `authored_by`/commit attribution inline, using the blame data
-from stage 3 — there's no separate attribution pass afterward. See
+**2. Blame + graph extraction.** For every discovered file, Contextual
+runs `git blame` as a native subprocess (first-parent, cached, enforced
+timeout), then tree-sitter parses the file's AST and extracts entities
+(functions, classes, imports, ...) and structural relationships (calls,
+inherits, imports, ...) into the dependency graph, enriched with
+`authored_by`/commit attribution inline from the blame pass. See
 `graph/explanation/the-knowledge-graph` for what actually gets extracted.
+
+**3. CHA/RTA pass + graph compaction.** A polymorphic-dispatch analysis
+pass resolves interface/abstract-method calls to their concrete
+implementations, followed by graph compaction — both moved here because
+neither one actually needs the embedding model.
+
+**4. Keyword/BM25 search index.** File content is written to a dedicated
+`lexical_files` table — whole-file granularity, no dependency on the
+chunker or embedding model — so keyword search works the moment this
+stage commits, independent of how long Deep Index takes.
+
+Once Dynamic Index finishes, `search`/`nexus_search`, graph traversal, and
+blame-enriched tools are all fully queryable — `search`/`nexus_search`
+transparently fall back to the `lexical_files` keyword layer if Deep
+Index hasn't caught up yet for this workspace (see
+`retrieval/how-to/understand-stale-or-missing-results`).
+
+### Deep Index — runs after, in the background
 
 **5. Chunk + embed.** Each file is split into chunks by a tree-sitter-aware
 split-merge algorithm — target 1,500 bytes, max 2,000, min 50, and it never
@@ -60,20 +79,18 @@ call) and is written to LanceDB.
 **6. Backfill + search rebuild.** Graph nodes that need a vector
 representation (for `nexus_search`'s semantic seed lookup) get one here,
 reusing chunk vectors from stage 5 where possible instead of re-embedding.
-Finally, the BM25 and trigram full-text search indexes are rebuilt so
+Finally, the `code_chunks`/`doc_chunks` full-text indexes are rebuilt so
 `search` returns fresh results without a daemon restart.
 
 <Callout variant="note">
-Graph extraction (stage 4) runs *before* chunking and embedding (stage 5),
-not after. This was a deliberate July 2026 reorder: graph extraction was
-measured taking ~76 minutes inside the full pipeline despite being
-provably ~20-30 seconds in isolation, with no data-size scaling issue —
-the leading theory was resource contention with the embedding model's ONNX
-session (which claims every CPU core) when the two stages ran back to
-back. Nothing in graph extraction actually depends on chunks or
-embeddings, so moving it earlier sidestepped the contention question
-instead of fully diagnosing it. Only the backfill step (stage 6) needs
-embeddings, so it correctly stays last.
+Within Dynamic Index, graph/blame extraction runs *before* Deep Index's
+chunking and embedding — a deliberate July 2026 reorder that predates the
+tiered split: graph extraction was measured taking ~76 minutes inside the
+full pipeline despite being provably ~20-30 seconds in isolation, the
+leading theory being resource contention with the embedding model's ONNX
+session (which claims every CPU core) when the two ran back to back.
+Nothing in graph extraction depends on chunks or embeddings, so it
+correctly belongs in the tier that doesn't wait on the model at all.
 </Callout>
 
 ## What each stage does *not* do
@@ -83,16 +100,32 @@ either is logged and swallowed rather than aborting the whole index run —
 a syntax-broken file or an ungraphable language shouldn't stop the rest of
 your repository from getting indexed and searchable.
 
-Nothing in any of these six stages makes a network call. The embedding
-model runs locally, CPU-only. See `trust-and-privacy/reference/data-privacy` for the
+Nothing in either tier makes a network call. The embedding model runs
+locally, CPU-only. See `trust-and-privacy/reference/data-privacy` for the
 complete list of what does and doesn't leave your machine.
+
+## Crash recovery, cancellation, and background operation
+
+The whole job — both tiers — runs in a detached process, not in your
+terminal's own process. `contextual index` attaches to it and shows live
+progress, but closing that terminal or pressing Ctrl+C only stops
+*watching* — the job keeps running. Reattach any time with `contextual
+index` (it detects the job already running for this workspace) or
+`contextual index --status`. Stop it for real with `contextual index
+--cancel`. If the job process itself dies (crash, `kill -9`, power loss),
+the next `contextual index` or a `contextual doctor` run detects it and
+either resumes or reports it, rather than silently reading as healthy —
+see `cli/reference/general/index` and
+`observability/how-to/interpreting-doctor-report`.
 
 ## Force vs. incremental
 
 Everything above describes a full index (`contextual index --force`, or
-the first `contextual index` in a workspace). `contextual index
---incremental` and the file-watcher-driven path skip straight to
-processing only the changed files, and run graph extraction per-file
-rather than as a batch pass — see
+the first `contextual index` in a workspace) — this is what runs the
+Dynamic/Deep Index split. `contextual index --incremental` and the
+file-watcher-driven path skip straight to processing only the changed
+files, running graph extraction and embedding per-file rather than as a
+batch pass, and typically finish in seconds rather than needing the
+tiered split at all — see
 `indexing/explanation/incremental-vs-scheduled-indexing` for how that path
 differs.

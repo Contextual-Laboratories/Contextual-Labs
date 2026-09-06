@@ -68,13 +68,19 @@ the complete field list.)
    regardless of name; a delete breaks anything that references the
    entity at all). Re-running with a different `change_type` on the
    same entity is expected to return a different result, not a bug.
-4. **`speculative_callers` only appears for `change_type="rename"`**,
-   and is deliberately kept separate from `impacted_nodes` rather than
-   merged in — these are `potential_call` edges the resolver couldn't
-   confirm statically. Treat every entry here as "check this by hand,"
-   not as a confirmed dependent; see
-   `graph/explanation/confidence-tiers-and-resolution` for why these
-   exist at all instead of just being dropped.
+4. **`speculative_callers` appears for `change_type="rename"` and
+   `change_type="signature_change"`**, and is deliberately kept separate
+   from `impacted_nodes` rather than merged in — these are
+   `potential_call` edges the resolver couldn't confirm statically. Treat
+   every entry here as "check this by hand," not as a confirmed
+   dependent; see `graph/explanation/confidence-tiers-and-resolution` for
+   why these exist at all instead of just being dropped.
+5. **For `change_type="signature_change"`, `_meta.completeness`** is
+   `"complete"`, `"partial"`, or `"unknown"`, alongside real
+   `confirmed_count`/`speculative_count` numbers — so you can tell "the
+   graph found nothing" apart from "the graph found this much and isn't
+   sure there's more." `"unknown"` (both counts zero) is not the same
+   claim as "confirmed safe."
 
 ## Before trusting a low or zero count
 

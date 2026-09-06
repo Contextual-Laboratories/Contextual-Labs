@@ -2,7 +2,7 @@
 title: "get_stats"
 domain: mcp-tools
 category: reference
-tldr: "get_stats(workspace) — index health, chunk counts, model status, cache hit rate, and graph density for the current workspace; the observability tool, not the code-content one."
+tldr: "get_stats(workspace) — index health, chunk counts, model status, cache hit rate, and graph connectivity (average edges per entity, directed density) for the current workspace; the observability tool, not the code-content one."
 order: 7
 ---
 

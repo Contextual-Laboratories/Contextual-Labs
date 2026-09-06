@@ -42,7 +42,12 @@ Either way, you get one command on your `PATH`: `contextual`.
 The package on PyPI is named `contextual-engine`; the command you actually
 type is `contextual`. If a script or doc ever shows `contextual-engine
 index` instead of `contextual index`, that's wrong — the entry point is
-just `contextual`.
+just `contextual`. A separate `contextual-engine` command also exists,
+but it launches the MCP server directly (the same thing `contextual-mcp`
+does), not the full CLI — it exists so MCP Registry clients that run
+`uvx contextual-engine` (matching the PyPI package name) get a working
+server out of the box. Day-to-day, as a human at a terminal, you still
+want `contextual`.
 </Callout>
 
 ## 2. Initialize your repository
@@ -77,21 +82,26 @@ section in `engine/` for what each `doctor` line actually means.
 contextual index
 ```
 
-This is the step that actually reads your code: walking git history for
-blame/temporal data, extracting the dependency graph, then chunking
-files and computing embeddings. On a first run over a real repository
-this can take a while — it's proportional to repository size, and it
-runs entirely on CPU (no GPU dependency, nothing leaves your machine).
+This is the step that actually reads your code. It spawns a background
+job and shows live progress: a fast Dynamic Index tier (git blame,
+dependency-graph extraction, keyword search) commits first, then Deep
+Index (chunking and embedding) fills in semantic search. On a first run
+over a real repository this can take a while — it's proportional to
+repository size, and it runs entirely on CPU (no GPU dependency, nothing
+leaves your machine).
 
 <Callout variant="note">
 Why this takes as long as it does: indexing is several sequential stages
-(blame history, then graph extraction, then chunking and embedding — in
-that order, not chunk-then-embed-first as you might expect), not one
-fast pass, and the embedding step runs a local model with no network
-calls. A large monorepo's first index is the slowest thing you'll do
-with Contextual — every run after that can be incremental (`contextual
-index --incremental`, covered in the how-to section) and only touches
-what git says changed.
+across two tiers (blame history, then graph extraction — in that order,
+not chunk-then-embed-first as you might expect — then chunking and
+embedding), not one fast pass, and the embedding step runs a local model
+with no network calls. Graph, blame, and keyword search are already
+usable once the first tier finishes, even before embedding completes.
+Closing the terminal or Ctrl+C only stops watching, not the job itself —
+run `contextual index --status` to check on it later. A large monorepo's
+first index is the slowest thing you'll do with Contextual — every run
+after that can be incremental (`contextual index --incremental`, covered
+in the how-to section) and only touches what git says changed.
 </Callout>
 
 ## 4. Connect an AI client

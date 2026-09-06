@@ -1,0 +1,149 @@
+id: "C002"
+domain: "engine"
+pypiVersion: "1.0.1"
+date: "2026-09-07"
+summary: >
+  Indexing now runs as a background job with a fast keyword-searchable
+  tier ahead of full semantic embedding, alongside a broad round of
+  accuracy fixes across dependency resolution, co-change coupling, commit
+  history, and graph/telemetry tool responses.
+entries:
+  - tag: feature
+    title: "Indexing runs in the background — `search` works before it's done"
+    description: >
+      `contextual index` now spawns a detached job with two tiers: a fast
+      **Dynamic Index** (file discovery, graph extraction, blame, keyword
+      search) that commits first, followed by a **Deep Index** (chunking,
+      embeddings) that fills in semantic search. `search` and
+      `nexus_search` automatically fall back to fast keyword matching
+      during that window and switch over the moment Deep Index finishes —
+      no incomplete results while a large repo is still embedding. The
+      job survives you leaving it: closing the terminal or `Ctrl+C` only
+      stops watching, not the job itself.
+    content:
+      type: code
+      label: terminal
+      code: |
+        $ contextual index
+          extracting graph + blame + keyword search…
+          extracting symbols + embedding…
+        Done. 412 files, 3,108 chunks.
+
+        $ contextual index --status
+          stage: deep_index
+  - tag: feature
+    title: "Indexing jobs are crash-safe, resumable, and cancelable"
+    description: >
+      A durable job-state record means a killed or crashed indexing job
+      (OOM, `kill -9`, a closed laptop lid) is never silently lost — the
+      next `contextual index` run detects it and resumes rather than
+      starting over. `contextual index --cancel` stops one for real, and
+      a desktop notification fires when the Dynamic Index becomes ready
+      and when the job finishes.
+  - tag: improvement
+    title: "`contextual doctor` now reports indexing job health and freshness"
+    description: >
+      Two new checks — **Indexing Job** (did the last run finish cleanly,
+      or crash mid-stage) and **Index Freshness** (how many files have
+      changed since the last index) — surface directly in `doctor` output
+      instead of requiring a separate `contextual index --status` check.
+  - tag: feature
+    title: "MCP Registry support — `uvx contextual-engine` now works"
+    description: >
+      Added a `contextual-engine` console-script alias matching the PyPI
+      package name, plus a registry manifest, so MCP Registry clients that
+      run `uvx <package-name>` get a working server out of the box. Day
+      to day, the CLI you actually type is still `contextual`.
+  - tag: fix
+    title: "Reduced noise in undeclared-coupling results"
+    description: >
+      `co_change_analysis` and `nexus_search` could surface a partner file
+      with negligible real historical coupling (observed as low as
+      0.0002 Jaccard similarity) with the same confidence as a genuinely
+      strong pairing. Weak pairings below a coupling-strength floor are now
+      reclassified and excluded by default, and a partner's shared commits
+      can be inspected directly as evidence via `include_receipts`.
+  - tag: fix
+    title: "Newly created or updated decisions could be invisible to search for minutes"
+    description: >
+      Creating, updating, or superseding an architectural decision didn't
+      invalidate the search cache — a new or changed decision could stay
+      absent from `search`/`nexus_search` results for up to the cache's
+      full TTL. Decision writes now invalidate the cache immediately.
+  - tag: fix
+    title: "Fixed inconsistent commit timestamps across co-change and blame history"
+    description: >
+      The same commit could show two different timestamps depending on
+      which code path recorded it — co-change history bootstrapped via
+      `--bootstrap-cochange` and one blame fallback path both recorded
+      *committer* time while everything else recorded *author* time; a
+      hardcoded `null` also shipped in `get_temporal_context`'s blame
+      timestamp field even though the real value was available. All three
+      now consistently report author time.
+  - tag: fix
+    title: "`entity_line_history` now respects `.git-blame-ignore-revs`"
+    description: >
+      Raw `git blame` already excludes commits listed in
+      `.git-blame-ignore-revs` (mass-reformat commits, for example) via
+      `--ignore-revs-file` — `entity_line_history`'s commit-history view
+      used `git log -L`, which has no equivalent flag, so it disagreed
+      with blame on the same commits. It now post-filters the same list
+      for parity.
+  - tag: improvement
+    title: "Dependency graph now records calls it couldn't resolve, instead of dropping them"
+    description: >
+      A `self.attr.method()` call whose attribute type can't be bound no
+      longer disappears from the graph silently — it's now recorded as an
+      `unresolved_call` triple, giving visibility into *why* an expected
+      dependency edge is missing rather than it just being absent.
+  - tag: improvement
+    title: "`graph_impact` flags when it's not confident it found everything"
+    description: >
+      For `change_type="signature_change"` (previously only `rename`),
+      `graph_impact` now includes a `speculative_callers` list plus a
+      `completeness`/`confirmed_count`/`speculative_count` signal — so
+      "the graph found nothing" and "the graph found this much and isn't
+      sure there's more" no longer look identical.
+  - tag: improvement
+    title: "`graph_at_time` snaps to the nearest real commit"
+    description: >
+      A raw timestamp that doesn't land exactly on an indexed commit now
+      resolves to the nearest one instead of a bare `not_found`, with a
+      typed `status` (`found`/`history_out_of_range`/`timestamp_unresolved`/
+      `entity_not_present`) and `resolution_distance_seconds` reporting how
+      far off the match actually was.
+  - tag: fix
+    title: "`graph_stats`' \"density\" number was misleading"
+    description: >
+      The reported `density` was actually average edges per entity, not
+      graph-theoretic density — one real graph reported `13.84`, nowhere
+      near a 0-1 density value. Replaced with two separate, correctly
+      labeled fields: `average_edges_per_entity` and `directed_density`.
+  - tag: improvement
+    title: "Lower token cost on repeated graph lookups"
+    description: >
+      `graph_impact` and `graph_get_entity_callers` now collapse an entity
+      already returned at full detail earlier in the same session to a
+      short reference by default (`full_detail=true` opts out), and a new
+      `no_preview` option (alongside `graph_traverse`, `nexus_search`, and
+      `graph_at_time`) skips the code preview entirely when you only need
+      identity and metadata — measured at roughly a 4x token-cost
+      reduction for overlapping calls in the same session.
+  - tag: improvement
+    title: "`get_telemetry` labels which data source each number comes from"
+    description: >
+      `activity`'s latency figures and `slow_operations`' durations
+      measure two different populations (completed tool calls vs. every
+      instrumented span, including internal indexing work) — a small
+      `p95` next to a much larger `slow_operations` entry looked like a
+      contradiction. The response now labels each field's real source and
+      population directly in `_meta.telemetry_sources`.
+  - tag: improvement
+    title: "Decision and history tools now include plain-language relative timestamps"
+    description: >
+      `decision_list`, `decision_search`, `get_temporal_context`,
+      `graph_at_time`, and `co_change_analysis` now return a
+      `relative_time` string ("3 days ago") alongside every exact
+      timestamp, plus a uniform `_meta.temporal_confidence` block flagging
+      degraded confidence (for example, from a shallow git clone) the same
+      way on every one of these tools.

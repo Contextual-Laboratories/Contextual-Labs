@@ -53,13 +53,14 @@ one store, not several different databases stitched together. See
 
 ## What actually happens when you run `contextual index`
 
-At a conceptual level, not the exact tuned parameters: your files are
-split into chunks, each chunk gets a local embedding (no network call),
-your code's structural relationships (calls, imports, inheritance) get
-extracted into a dependency graph, and your git history gets walked to
-attach blame and temporal metadata to what was extracted. All four
-outputs land in the same LanceDB store. `indexing/explanation/how-indexing-
-works` covers this pipeline stage by stage.
+At a conceptual level, not the exact tuned parameters: a background job
+extracts your code's structural relationships (calls, imports,
+inheritance) into a dependency graph and walks your git history to
+attach blame and temporal metadata, making graph/blame/keyword search
+queryable first — then your files are split into chunks and each chunk
+gets a local embedding (no network call), which fills in semantic search.
+All outputs land in the same LanceDB store. `indexing/explanation/how-indexing-
+works` covers this tier by tier.
 
 ## What stays on your machine
 

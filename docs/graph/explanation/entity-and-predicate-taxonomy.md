@@ -45,7 +45,7 @@ follow a relationship from a function straight to the commit that last
 touched it, or to the architectural decision that motivated it, without
 switching to a different tool or data source.
 
-## The 18 predicates
+## The 19 predicates
 
 Structural relationships, extracted directly from parsed code:
 
@@ -59,7 +59,18 @@ Structural relationships, extracted directly from parsed code:
 - `potential_call` — a speculative call the resolver couldn't confirm
   statically. Excluded from most results by default; surfaced
   explicitly (and clearly labeled) where it's directly relevant, such
-  as `graph_impact`'s `speculative_callers` list for a rename.
+  as `graph_impact`'s `speculative_callers` list for a rename or
+  signature change.
+- `unresolved_call` — a `self.attr.method()`-shaped call where the
+  receiver attribute's type couldn't be bound, so there's no candidate
+  target to record at all — not even a speculative one. `object_id` is
+  always `NULL` on these rows; the callee and the reason live in
+  `object_literal` instead. Not reachable through `graph_traverse`/
+  `graph_impact` (their in-memory graph requires a real `object_id` per
+  edge) — `graph_query` surfaces it in the edges list for a matched
+  entity (it can't be used as a `predicate=` filter in the query itself),
+  so an entity with a call the resolver couldn't figure out shows that
+  gap explicitly, rather than the dependency silently being absent.
 - `imports`, `defines`, `references`, `inherits_from`, `implements`,
   `tests`, `documented_by`, `mentions`
 

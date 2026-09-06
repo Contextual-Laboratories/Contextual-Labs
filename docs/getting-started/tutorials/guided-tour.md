@@ -34,9 +34,9 @@ teammate on day one.
 ## Step 1 — this question could only be answered because indexing already ran
 
 Before this question meant anything to Contextual, `contextual index` had
-already: chunked every file, extracted a dependency graph of entities and
-relationships, walked git blame history, and embedded everything with a
-local model — all six stages covered in
+already: extracted a dependency graph of entities and relationships,
+walked git blame history, chunked every file, and embedded everything
+with a local model — the Dynamic Index and Deep Index tiers covered in
 `indexing/explanation/how-indexing-works`. None of that happens at query
 time; it's why an answer comes back in seconds instead of Contextual
 re-reading your entire repository on the spot.

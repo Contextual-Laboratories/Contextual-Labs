@@ -22,6 +22,10 @@ in one round trip, with no prior `entity_id` required.
   selection.
 - `include_code` (boolean, default false) — include full `code_text`
   per node instead of a short preview.
+- `no_preview` (boolean, default false) — omit the short code preview
+  entirely instead of `include_code`'s default ~70-line snippet; use it
+  when you only need node identity/metadata and want to spend zero
+  tokens on code text either way.
 - `gcf` (boolean, default false) — return the compact GCF-encoded text
   format instead of JSON.
 - `workspace` (string, optional).
@@ -34,6 +38,14 @@ without manually chaining `search` + `graph_traverse` +
 want the enriched bundle in one call. Skip it if you only need ranked
 semantic snippets with no graph context (use `search`), or you're doing
 co-change analysis (use `co_change_analysis`).
+
+<Callout variant="note">
+If Deep Index hasn't finished yet for this workspace, the response's
+stale warnings carry a `DYNAMIC_INDEX_ONLY` note flagging that semantic
+results may still be incomplete — unlike `search`, which actively
+reroutes to the keyword layer in that window, this is a heads-up rather
+than a behavior change. See `indexing/explanation/how-indexing-works`.
+</Callout>
 
 ## See also
 

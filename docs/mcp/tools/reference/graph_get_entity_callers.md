@@ -2,7 +2,7 @@
 title: "graph_get_entity_callers"
 domain: mcp-tools
 category: reference
-tldr: "graph_get_entity_callers(entity_id, limit, include_code, gcf, workspace) — a flat, one-hop backward lookup: everything that directly calls or imports this entity."
+tldr: "graph_get_entity_callers(entity_id, limit, include_code, no_preview, full_detail, gcf, workspace) — a flat, one-hop backward lookup: everything that directly calls or imports this entity."
 order: 9
 ---
 
@@ -18,6 +18,13 @@ traversal.
   of.
 - `limit` (integer, 1–50, default 20).
 - `include_code` (boolean, default false).
+- `no_preview` (boolean, default false) — omit the short code preview
+  entirely instead of `include_code`'s default snippet.
+- `full_detail` (boolean, default false) — an entity already returned at
+  full detail earlier in this session collapses to a short
+  `{id, name, already_shown: true}` reference by default (e.g. after a
+  `graph_impact` call on an overlapping entity set); pass `true` to opt
+  out for one call.
 - `gcf` (boolean, default false).
 - `workspace` (string, optional).
 

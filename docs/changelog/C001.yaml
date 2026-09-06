@@ -1,0 +1,47 @@
+id: "C001"
+domain: "engine"
+pypiVersion: "1.0.0"
+date: "2026-08-27"
+commit: "70df6f8"
+summary: >
+  Launch day. `contextual-engine` v1.0.0 is live — the full temporal-first
+  code memory engine, with hybrid search, dependency-graph traversal,
+  blast-radius impact analysis, and architectural decision history, shipped
+  as an MCP server any AI coding tool can plug into.
+entries:
+  - tag: feature
+    title: "Launch day: Contextual is live"
+    description: >
+      The wait is over. After a private beta, `contextual-engine` is live
+      on PyPI — install it with `pip install contextual-engine`, point any
+      MCP-compatible client (Claude Code, Claude Desktop, and others) at
+      the local `contextual mcp` server, and get persistent, temporal
+      memory of your codebase from day one. No re-indexing every session,
+      no re-explaining context every conversation.
+    content:
+      type: code
+      label: terminal
+      code: |
+        $ pip install contextual-engine
+        $ contextual init
+        $ contextual mcp start
+          → indexing … done
+          → MCP server ready on stdio
+  - tag: feature
+    title: "A full toolset for code intelligence, not just search"
+    description: >
+      v1.0.0 ships 22 MCP tools spanning hybrid semantic + keyword search,
+      dependency-graph traversal, blast-radius/impact analysis for any
+      proposed change, git-blame-enriched history, undeclared-coupling
+      detection (`co_change` analysis), and architectural decision
+      records — all queryable by an AI agent through one MCP interface.
+  - tag: feature
+    title: "14 languages supported out of the box"
+    description: >
+      Parsing, graph extraction, and blame history work across 14
+      languages on day one — Python, JavaScript/TypeScript, Java, Go, Rust,
+      C#, Kotlin, Swift, Ruby, PHP, and more — with no per-language setup.
+  - tag: feature
+    title: "`Solo` plan is live"
+    description: >
+      Pricing launches today with the Solo plan for individual developers.

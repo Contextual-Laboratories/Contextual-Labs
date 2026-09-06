@@ -2,7 +2,7 @@
 title: Graph schema reference
 domain: graph
 category: reference
-tldr: "The graph lives in two tables — entities (nodes) and triples (edges) — plus the fixed 15 entity types and 18 predicates every row's entity_type/predicate field is drawn from."
+tldr: "The graph lives in two tables — entities (nodes) and triples (edges) — plus the fixed 15 entity types and 19 predicates every row's entity_type/predicate field is drawn from."
 related:
   - graph/explanation/entity-and-predicate-taxonomy.md
   - indexing/reference/storage-schema-reference.md
@@ -36,7 +36,7 @@ table list.
 |---|---|---|
 | `id` | string | Edge identity hash. |
 | `entity_id` | string | Subject — foreign key into `entities.id`. |
-| `predicate` | string | One of the 18 predicates below. |
+| `predicate` | string | One of the 19 predicates below. |
 | `object_id` | string, nullable | Object — foreign key into `entities.id`, when the edge points at another entity. |
 | `object_literal` | string, nullable | JSON payload for edges whose object is a literal value rather than another entity. |
 | `weight` | float | Edge weight, `1.0` by default. |
@@ -58,13 +58,24 @@ see `temporal/explanation/temporal-intelligence`.
 `variable`, `constant`, `type`, `interface`, `enum`, `adr`, `commit`,
 `author`
 
-## The 18 predicates
+## The 19 predicates
 
 `calls`, `instantiates`, `calls_polymorphic`, `potential_call`,
-`imports`, `defines`, `references`, `inherits_from`, `implements`,
-`tests`, `documented_by`, `mentions`, `supersedes`,
+`unresolved_call`, `imports`, `defines`, `references`, `inherits_from`,
+`implements`, `tests`, `documented_by`, `mentions`, `supersedes`,
 `supersedes_entity`, `motivated_by`, `authored_by`, `modified_in`,
 `co_changes_with`
+
+<Callout variant="note">
+`unresolved_call` rows have `object_id: NULL` — there's no candidate
+target entity to point at, by definition. They're invisible to
+`graph_traverse`/`graph_impact`'s in-memory graph (which requires a real
+`object_id` per edge). `graph_query` surfaces them in the edges list it
+returns for a matched entity, but its `query` WHERE-clause filters
+entities only — you can't filter directly on `predicate` there, so find
+the entity first (e.g. `entity_type = 'method'`) and look for
+`unresolved_call` among its returned edges.
+</Callout>
 
 See `graph/explanation/entity-and-predicate-taxonomy` for what each one
 means, not just the name.

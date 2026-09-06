@@ -29,7 +29,8 @@ acting on.
       "co_change_count": 14,
       "coupling_strength": 0.42,
       "has_structural_dependency": false,
-      "is_undeclared_coupling": true
+      "is_undeclared_coupling": true,
+      "classification": "undeclared_coupling"
     },
     ...
   ],
@@ -83,6 +84,23 @@ Every partner is checked against the graph for a direct `calls`,
 
 `summary.undeclared_couplings` gives you the count up front; check that
 before scanning the full partner list.
+
+## `classification`: telling real coupling apart from raw-count noise
+
+A partner can clear the `co_change_min_commits` floor on raw count alone
+while its `coupling_strength` (Jaccard ratio) is still near zero — an
+entity with a large individual change history can rack up a shared
+commit or two with almost everything it's ever near, without any real
+pattern. `classification` distinguishes the two: `undeclared_coupling`
+(above the coupling-strength floor — the real signal) versus
+`weak_historical_association` (below it — noise, even though it passed
+the commit-count gate). Weak partners are excluded from the response by
+default; pass `include_weak=true` to see them anyway, and
+`_meta.excluded_weak_count`/`weak_hint` tell you how many were left out.
+Pass `include_receipts=true` to get each partner's actual shared commits
+(hash/author/timestamp, capped at 10) instead of taking the count on
+faith — useful when a coupling looks surprising and you want to verify
+it before acting on it.
 
 ## Before a refactor
 

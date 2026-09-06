@@ -20,6 +20,11 @@ supersession links — without a semantic search step.
 - `limit` (integer, 1–100, default 20).
 - `workspace` (string, optional).
 
+Each ADR carries `relative_time` ("3 days ago") alongside its exact
+`valid_at` timestamp, and the response's `_meta.temporal_confidence`
+carries the same `{degraded, reasons}` shape used across every
+history-derived tool (see `get_temporal_context`).
+
 ## When to use it (and when not to)
 
 Call it for "what decisions have been made" or to get an `adr_id`

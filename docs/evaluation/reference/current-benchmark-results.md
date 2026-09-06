@@ -12,6 +12,17 @@ related:
 
 Live retrieval-accuracy and performance numbers from Contextual's own eval suite, measured on real open-source repositories pinned in `eval/manifest.yml`. Primary hardware profile: `m2_air_8gb` — see `evaluation/explanation/what-a-benchmark-number-means-here` for why only this profile's numbers are published as a hardware claim. Published on demand, not on a fixed schedule — see `evaluation/explanation/how-we-evaluate-retrieval-quality` for methodology.
 
+<Callout variant="note">
+**Dev note:** the eval harness was updated alongside v1.0.1's background
+indexing rebuild to measure the Dynamic Index and Deep Index tiers
+separately (see `indexing/explanation/how-indexing-works`), instead of
+one point-in-time snapshot after indexing finishes. The numbers below
+predate that change and haven't been re-run against it yet — they're
+left as the last verified baseline rather than pulled, but treat the
+indexing-time/phased figures as due for a refresh once the new eval runs
+complete, not as reflecting the current architecture.
+</Callout>
+
 ## Per-repo results (m2_air_8gb)
 
 | Repo | Language(s) | LOC | Recall@10 | NDCG@10 | MRR@10 | Median query latency | Indexing time | Peak RSS |

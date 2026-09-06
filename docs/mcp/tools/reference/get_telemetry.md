@@ -40,6 +40,18 @@ trail, a separate mechanism) is unaffected either way. See
 `observability/explanation/how-tracing-and-logging-work` for why these
 are two different data sources with different availability.
 
+`_meta.telemetry_sources` labels this explicitly in the response itself:
+`activity`'s `avg_latency_ms`/`p95_latency_ms` come from `audit_log` —
+completed MCP tool-call round-trips only (successful and failed alike,
+unless `errors_only` narrowed it), excluding protocol/session bookkeeping
+calls. `slow_operations` comes from `otel_spans` — every instrumented
+span in the window, not just tool calls, including internal indexing/
+pipeline operations that can run far longer than any tool-call
+round-trip (narrow it to one tool's own spans by passing `tool_name`). A
+small `activity.p95_latency_ms` sitting next to a much larger
+`slow_operations` entry is expected given these are different
+populations, not a contradiction.
+
 Every `recent_errors` entry always carries an `error_code`: a real
 Contextual error code when the failure was typed, or the literal
 string `"uncoded (real error, not yet mapped to a Contextual error

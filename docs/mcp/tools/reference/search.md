@@ -34,6 +34,17 @@ symbol/file not already visible in context. Skip it if you already have
 the exact file content from a prior `get_file_content` call, or the
 question is about an unrelated codebase.
 
+<Callout variant="note">
+If Deep Index (embedding) hasn't finished yet for this workspace — right
+after a fresh or forced `contextual index` — `search` automatically falls
+back to Dynamic Index's keyword/BM25 layer instead of returning
+incomplete semantic results, and adds a `DYNAMIC_INDEX_ONLY` entry to the
+response's stale warnings so you know results are keyword-matched, not
+semantically ranked, for now. This switches back to the normal path the
+moment Deep Index completes — see
+`indexing/explanation/how-indexing-works`.
+</Callout>
+
 <Terminal lines={[
   {command: "search(query=\"how does license validation work\", intent=\"code\")"},
   {output: "{\n  \"results\": [ ... 8 ranked chunks ... ],\n  \"related_nodes\": [ ... ],\n  \"latency_ms\": 84\n}", muted: true}

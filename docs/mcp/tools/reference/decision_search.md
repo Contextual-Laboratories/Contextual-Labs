@@ -20,6 +20,12 @@ status filter.
   currently a no-op.
 - `workspace` (string, optional).
 
+Each returned ADR carries `relative_time` ("3 days ago") alongside its
+exact `valid_at` timestamp, and the response's `_meta.temporal_confidence`
+carries the same `{degraded, reasons}` shape used across every
+history-derived tool (see `get_temporal_context`) — check it before
+trusting a match found in a shallow clone.
+
 ## When to use it (and when not to)
 
 Call it for architectural-reasoning questions about past design

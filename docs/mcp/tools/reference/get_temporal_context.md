@@ -27,7 +27,13 @@ The response also includes `blame_confidence`: `{"degraded": true,
 "reasons": ["shallow_clone"]}` when the workspace is a shallow git
 clone, since blame and commit history can't see past a shallow clone's
 truncation boundary — treat attribution as unverified in that case
-rather than at face value. See
+rather than at face value. `_meta.temporal_confidence` carries the same
+`{degraded, reasons, history_window_days}` shape — a uniform block shared
+across every history-derived tool (`graph_at_time`, `co_change_analysis`,
+`decision_list`, `decision_search`) — `blame_confidence` is kept
+alongside it for backward compatibility, not replaced. Each recent commit
+and the blame sub-response also carry a `relative_time` string ("3 days
+ago") next to their exact ISO timestamp. See
 `temporal/reference/temporal-query-reference` for the full field
 breakdown.
 

@@ -19,9 +19,11 @@ watcher is running and sees a change.
 ## The two ways your index actually gets updated
 
 **A manual full index** — `contextual index` (or `contextual index
---force` to re-embed everything regardless of what's changed). This runs
-the six-stage pipeline described in
-`indexing/explanation/how-indexing-works` once, then exits.
+--force` to re-embed everything regardless of what's changed). This
+spawns the background Dynamic Index → Deep Index job described in
+`indexing/explanation/how-indexing-works`, then exits once both tiers
+finish (or once you stop watching — the job itself keeps running either
+way).
 
 **A running file watcher** — started alongside the daemon, watching your
 workspace for changes while it's active. Two watchers run together:

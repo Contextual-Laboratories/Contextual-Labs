@@ -26,6 +26,8 @@ just to get the hash.
 - `limit` (integer, optional) — max nodes to return; defaults scale with
   depth, hard-capped at 100.
 - `include_code` (boolean, default false).
+- `no_preview` (boolean, default false) — omit the short code preview
+  entirely instead of `include_code`'s default snippet.
 - `gcf` (boolean, default false) — compact GCF-encoded text format.
 - `workspace` (string, optional).
 

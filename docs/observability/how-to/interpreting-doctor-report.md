@@ -2,12 +2,12 @@
 title: Interpreting a doctor Report
 domain: observability
 category: how-to
-tldr: "contextual doctor runs seven independent checks — Configuration, Directories, Models, Daemon & Locks, Database, MCP Integration, and Git Integration — each pass/fail with a specific detail line, not a single overall health score."
+tldr: "contextual doctor runs nine independent checks — Configuration, Directories, Models, Daemon & Locks, Database, MCP Integration, Git Integration, Indexing Job, and Index Freshness — each pass/fail with a specific detail line, not a single overall health score."
 order: 1
 ---
 
 <Callout variant="tldr">
-`contextual doctor` runs seven independent checks and prints one
+`contextual doctor` runs nine independent checks and prints one
 pass/fail line per check, each with a specific detail message — not a
 single "healthy/unhealthy" verdict. Read the detail line, not just the
 pass/fail, since that's where the actual next step lives.
@@ -19,10 +19,10 @@ contextual doctor
 
 <Terminal lines={[
   {command: "contextual doctor"},
-  {output: "Configuration    OK\nDirectories      OK\nModels           OK    Embed weights present.\nDaemon & Locks   OK\nDatabase         OK\nMCP Integration  OK    clients.json exists.\nGit Integration  OK", muted: true}
+  {output: "Configuration    OK\nDirectories      OK\nModels           OK    Embed weights present.\nDaemon & Locks   OK\nDatabase         OK\nMCP Integration  OK    clients.json exists.\nGit Integration  OK\nIndexing Job     OK    Last run: succeeded.\nIndex Freshness  OK    Up to date — no changes since the last index.", muted: true}
 ]} />
 
-## The seven checks
+## The nine checks
 
 **Configuration** — whether a global config file exists, and if a
 workspace-level config also exists, whether the two are consistent.
@@ -60,6 +60,21 @@ silently treating it as absent.
 repository. Contextual's temporal features (blame, history, decisions)
 depend on this; a failure here doesn't stop indexing, but it does mean
 temporal/blame-enriched features won't have anything to draw on.
+
+**Indexing Job** — whether this workspace's last background indexing job
+(see `cli/reference/general/index`) actually finished cleanly. A job
+record showing "running" is checked for a real live process, not just
+trusted at face value — if the process that owned it is gone (crashed,
+`kill -9`, power loss) this check fails with the stage it was on and
+tells you to run `contextual index` again to resume, rather than reading
+as healthy indefinitely.
+
+**Index Freshness** — informational, not a pass/fail gate: how many
+files have changed (by git status) since the last completed index. A
+workspace mid-edit is expected to show unindexed changes; this only ever
+fails if the freshness check itself errors. See
+`indexing/explanation/incremental-vs-scheduled-indexing` for when your
+index actually catches back up.
 
 <Callout variant="note">
 Each check's detail message is written to tell you what to run next, not

@@ -74,12 +74,23 @@ A `potential_call` edge (the `speculative` tier) still gets written to
 the graph — it isn't discarded — but ordinary `graph_traverse` and
 `graph_impact` calls don't surface it unless the situation specifically
 calls for it. The one deliberate exception: `graph_impact` with
-`change_type="rename"` includes a separate, explicitly labeled
-`speculative_callers` list precisely because an undercounted blast
-radius before a rename is a worse failure mode than showing some
-advisory-only, unconfirmed candidates alongside the confirmed ones. See
+`change_type="rename"` or `change_type="signature_change"` includes a
+separate, explicitly labeled `speculative_callers` list precisely
+because an undercounted blast radius before either kind of change is a
+worse failure mode than showing some advisory-only, unconfirmed
+candidates alongside the confirmed ones. See
 `graph/how-to/interpret-a-blast-radius-report` for how to read that
 list without over-trusting it.
+
+<Callout variant="note">
+`unresolved_call` is a different thing entirely from the tier system
+above — it's not a low-confidence guess, it's an honest "the resolver had
+no candidate to even guess at" marker (a `self.attr.method()` call whose
+attribute type couldn't be bound). It's real data in the graph, but
+outside the tier hierarchy and outside `graph_traverse`/`graph_impact`'s
+in-memory model entirely — see
+`graph/explanation/entity-and-predicate-taxonomy` for how to find it.
+</Callout>
 
 ## What this means when you're reading a result
 
