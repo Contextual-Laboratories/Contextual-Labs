@@ -1,0 +1,43 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
+  "name": "io.github.Contextual-Laboratories/contextual",
+  "description": "Persistent memory for AI coding agents: local-first semantic search, dependency graphs, git history.",
+  "repository": {
+    "url": "https://github.com/Contextual-Laboratories/Contextual-Labs",
+    "source": "github"
+  },
+  "version": "1.0.2",
+  "packages": [
+    {
+      "registryType": "pypi",
+      "registryBaseUrl": "https://pypi.org",
+      "identifier": "contextual-engine",
+      "version": "1.0.2",
+      "transport": {
+        "type": "stdio"
+      },
+      "packageArguments": [
+        {
+          "type": "named",
+          "name": "--client",
+          "description": "Client name shown in this process's title (e.g. claude-code, cursor). Auto-detected if omitted.",
+          "isRequired": false
+        },
+        {
+          "type": "named",
+          "name": "--workspace",
+          "description": "Explicit workspace path to index/serve. Omit to run in multi-workspace mode, where each tool call resolves its workspace automatically.",
+          "isRequired": false
+        }
+      ],
+      "environmentVariables": [
+        {
+          "name": "CONTEXTUAL_LOG_LEVEL",
+          "description": "Python logging level as an integer (e.g. 10=DEBUG, 20=INFO). Defaults to INFO.",
+          "isRequired": false,
+          "isSecret": false
+        }
+      ]
+    }
+  ]
+}
