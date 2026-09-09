@@ -16,6 +16,7 @@
   <a href="https://contextuallabs.dev"><img alt="Website" src="https://img.shields.io/badge/site-contextuallabs.dev-000000?style=flat-square"></a>
   <a href="https://contextuallabs.dev/docs"><img alt="Docs" src="https://img.shields.io/badge/docs-read-000000?style=flat-square"></a>
   <a href="https://github.com/Contextual-Laboratories/Contextual-Labs/releases"><img alt="Latest Release" src="https://img.shields.io/github/v/release/Contextual-Laboratories/Contextual-Labs?include_prereleases&style=flat-square&color=000000&label=embedding%20model"></a>
+  <a href="CHANGELOG.md"><img alt="Changelog" src="https://img.shields.io/badge/changelog-keep%20a%20changelog-000000?style=flat-square"></a>
   <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/license-all%20rights%20reserved-000000?style=flat-square"></a>
 </p>
 
@@ -23,6 +24,7 @@
   <a href="#install"><b>Install</b></a> ·
   <a href="#what-is-contextual">What is Contextual?</a> ·
   <a href="#documentation">Docs</a> ·
+  <a href="CHANGELOG.md">Changelog</a> ·
   <a href="#report-a-bug-or-request-a-feature">Support</a>
 </p>
 
