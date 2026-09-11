@@ -1,4 +1,4 @@
-Copyright (c) 2026 Arjun Mahule. All rights reserved.
+Copyright (c) 2026 Contextual Laboratories. All rights reserved.
 
 This repository and its contents (including documentation, text, issue
 templates, workflow configuration, and any other files herein) are made
@@ -13,7 +13,8 @@ Viewing this repository, and submitting issues or feedback through it,
 does not grant any rights to its contents.
 
 This license applies to this repository only. The Contextual engine (CLI
-and MCP server) is licensed separately under the Business Source License
-1.1 — see the `Contextual` repository for those terms.
+and MCP server) is proprietary software, licensed separately — see
+https://contextuallabs.dev/terms for the full license terms.
 
 All rights not expressly granted herein are reserved.
+
