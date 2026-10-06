@@ -61,6 +61,24 @@ uses, and treat a raised value as something to revert if you see memory
 pressure during a large index run.
 </Callout>
 
+## Inference thread count
+
+The embedder sizes its ONNX threads to your machine's physical
+*performance* cores rather than every logical core. On Apple Silicon
+that means the Performance-core count (read from the system), so the
+slower Efficiency cores don't hold up a batch: ONNX's parallelism waits
+for its slowest thread, and one landing on an Efficiency core made
+batch times swing from seconds to minutes. On other platforms it uses
+the physical core count, and falls back to the logical core count if
+that can't be read. To pin it yourself, for measurement or tuning:
+
+```
+CONTEXTUAL_ONNX_THREADS=4 contextual index
+```
+
+A value that isn't a positive integer is ignored. Like batch size, this
+is a tuning escape hatch, not something normal use needs.
+
 ## ONNX Runtime threading and memory-arena variables
 
 The embedder sets a handful of ONNX Runtime and OpenMP environment

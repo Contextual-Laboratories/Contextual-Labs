@@ -15,6 +15,11 @@ snapshot, not current state.
 ## Parameters
 
 - `entity_id` (string, required) — entity hash or FQN to snapshot.
+  Besides a raw hash or an FQN, a bare symbol name (`LanceDBConnector`)
+  or a repo-relative file path (`contextual/storage/connection.py`) also
+  resolves. If several entities share a bare name, the most-referenced
+  one is chosen; use an FQN when you need a specific one. See
+  `troubleshooting/entity-not-found`.
 - `timestamp` (string, required) — ISO 8601 timestamp or git commit SHA
   (7–40 hex chars).
 - `depth` (integer, 1–3, default 1) — neighborhood hops to include.
@@ -38,6 +43,22 @@ carries `snapshot_relative_time` ("3 days ago" alongside the exact
 `snapshot_at` timestamp) and `_meta.temporal_confidence` — the same
 `{degraded, reasons}` shape used across every history-derived tool (see
 `get_temporal_context`).
+</Callout>
+
+<Callout variant="note">
+A file entity's validity start is the timestamp of its latest commit, not
+the moment it was indexed. Before that was fixed, a file entity always
+looked newer than any historical timestamp, so `graph_at_time` returned
+`entity_not_present` for files at every past point regardless of how long
+they had existed. Files indexed before the fix pick up the correct
+timestamp on their next index run.
+</Callout>
+
+<Callout variant="note">
+When more neighborhood nodes exist than `limit` returned, the response
+leads with a top-level `_status` sentence ("Showing 12 of 31 matches —
+…") before any other field, instead of leaving `_meta.truncated` as a
+boolean you had to already know to check.
 </Callout>
 
 ## When to use it (and when not to)

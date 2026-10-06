@@ -34,7 +34,7 @@ a raw number a caller would otherwise have to interpret unassisted.
 |---|---|---|
 | `high` | ≥ 0.90 | Unambiguous — import-attested, or the only same-file/global candidate. |
 | `moderate` | 0.75–0.89 | A confident but slightly less certain match — e.g. a unique name resolved without an explicit import. |
-| `low` | 0.55–0.74 | An ambiguous fallback match — still included in default results, but the weakest tier that is. |
+| `low` | 0.55–0.74 | A weak-evidence match — the only remaining candidate, with an import hint but no resolvable path. Still included in default results, but the weakest tier that is. |
 | `speculative` | < 0.55 | Below the default floor — `potential_call` edges live here (see below). |
 | `unknown` | — | No confidence score was recorded for this edge at all. |
 
@@ -55,8 +55,12 @@ different reasons:
 edges) leans on how unambiguous the match was: a call resolved via an
 explicit import, or matching exactly one entity of that name anywhere
 reachable from the caller, lands in the highest tier. A name that's
-only unique if you ignore file/language boundaries, or that has more
-than one plausible target, lands lower.
+only unique if you ignore file/language boundaries lands lower. A name
+with more than one equally plausible target, and nothing (an import path,
+the same directory) to choose between them, gets **no edge at all** — the
+resolver never picks one by indexing order, which would make the graph
+depend on the order files were saved. For a call it records an
+`unresolved_call` marker instead (see below).
 
 **CHA/RTA virtual-dispatch resolution** (`calls_polymorphic` edges,
 see `graph/explanation/the-knowledge-graph`) tiers purely by how close
@@ -84,9 +88,12 @@ list without over-trusting it.
 
 <Callout variant="note">
 `unresolved_call` is a different thing entirely from the tier system
-above — it's not a low-confidence guess, it's an honest "the resolver had
-no candidate to even guess at" marker (a `self.attr.method()` call whose
-attribute type couldn't be bound). It's real data in the graph, but
+above — it's not a low-confidence guess, it's an honest "the resolver
+declined to pick a target" marker. Its `unresolved_reason` says why: the
+receiver's type couldn't be bound (`untyped_receiver`, or
+`attribute_type_unknown` for a `self.attr.method()` call), or several
+equally plausible targets exist (`ambiguous`, with the candidate count
+recorded). It's real data in the graph, but
 outside the tier hierarchy and outside `graph_traverse`/`graph_impact`'s
 in-memory model entirely — see
 `graph/explanation/entity-and-predicate-taxonomy` for how to find it.

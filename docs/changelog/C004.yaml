@@ -1,0 +1,67 @@
+id: "C004"
+domain: "engine"
+pypiVersion: "1.0.3"
+date: "2026-09-23"
+commit: "624ed3e"
+summary: >
+  A perf-and-reliability pass across indexing and retrieval: blame and
+  commit-history collection are dramatically faster on large
+  repositories, `co_change_analysis` no longer waits for Deep Index to
+  finish, silent per-file symbol-extraction failures now surface through
+  `contextual doctor` instead of being swallowed, and a keyword-search
+  index-rebuild bug that leaked orphaned index directories over time is
+  fixed.
+entries:
+  - tag: improvement
+    title: "Blame and commit-history collection is dramatically faster on large repositories"
+    description: >
+      Two separate inefficiencies in git-log-based commit-history
+      collection are fixed. What used to be one `git log` subprocess per
+      file is now a single repository-wide walk, reconstructing each
+      file's history — including through renames — from that one pass:
+      measured equivalent to the old approach with zero mismatches on a
+      real large repository, at a fraction of the wall-clock cost.
+      Separately, narrow-entity history lookups that only depend on a
+      file's path no longer spawn a duplicate subprocess for every
+      entity sharing that file — one shared lookup per file instead.
+      Default concurrency for the remaining per-entity work is also
+      raised from 4 to 8, based on directly measured headroom on top of
+      these fixes.
+  - tag: fix
+    title: "`co_change_analysis` no longer waits for Deep Index to finish"
+    description: >
+      Undeclared-coupling data only depends on commit history — not on
+      chunking or embeddings — but it was populated on the same schedule
+      as the embedding step anyway, so `co_change_analysis` always
+      returned zero partners on a workspace still mid-embedding even
+      though the data it needs was already there. It's now populated as
+      part of Dynamic Index, so it's queryable the moment that faster
+      tier commits.
+  - tag: fix
+    title: "Silent per-file symbol-extraction failures are now surfaced instead of swallowed"
+    description: >
+      A file whose chunking succeeded but whose symbol/entity extraction
+      failed looked fully healthy — indexed and searchable — while
+      silently contributing zero functions, classes, or call-graph edges
+      to the dependency graph, with nothing anywhere flagging it.
+      `contextual doctor` (and the `get_doctor` MCP tool) now reports
+      this as its own degraded status, naming the affected files
+      directly instead of leaving the gap invisible.
+  - tag: fix
+    title: "Fixed orphaned index-directory leaks from keyword-search index rebuilds"
+    description: >
+      Full-text-search index rebuilds (code, symbol, and doc keyword
+      indexes) weren't tracked by the background garbage collector the
+      same way every other index rebuild in the system already was, so
+      repeated rebuilds over time left behind index directories that
+      were never reclaimed — one real workspace had far more physical
+      index directories on disk than its logical index count justified.
+      All keyword-index rebuilds now route through the same tracked
+      cleanup path, and the grace window before a stale directory is
+      actually reclaimed is tightened from 2 hours to 1.
+  - tag: improvement
+    title: "Faster lookup-only search calls"
+    description: >
+      Search calls that only need ranked matches — not surrounding code
+      context — now skip graph-traversal and context-assembly work they
+      never used, shaving latency off that path.

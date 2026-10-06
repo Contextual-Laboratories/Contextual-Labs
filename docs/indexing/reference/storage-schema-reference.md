@@ -28,10 +28,11 @@ everything Contextual actually knows about that specific codebase.
 
 | Table | What it holds |
 |---|---|
-| `code_chunks` / `doc_chunks` | Tree-sitter-split code and documentation chunks, with embeddings — what `search` and BM25/trigram FTS query against. |
+| `code_chunks` / `doc_chunks` | Tree-sitter-split code and documentation chunks, with embeddings and a stored structural MinHash fingerprint (`structural_minhash`, used for near-duplicate diversity) — what `search` and BM25/trigram FTS query against. |
+| `lexical_files` / `lexical_chunks` | The Dynamic Index keyword layer, available before Deep Index finishes: whole-file text and function/class-sized chunks with no embeddings. Removed automatically a couple of hours after Deep Index completes for the workspace — see `indexing/explanation/how-indexing-works`. |
 | `entities` / `triples` | Knowledge graph nodes and edges — see `graph/explanation/the-knowledge-graph`. |
 | `commits` / `blame_cache` / `entity_commits` | Git commit metadata, cached `git blame` output, and per-entity commit history — see `temporal/explanation/temporal-intelligence`. |
-| `adrs` / `adr_embeddings` / `adr_pending_refs` | Architectural Decision Records and their embeddings, plus provisional entity references awaiting resolution. |
+| `adrs` / `adr_embeddings` / `adr_pending_refs` | Architectural Decision Records and their embeddings (plus full-text indexes over their title and decision text, which `decision_search` uses for keyword rescue), plus provisional entity references awaiting resolution. |
 | `file_state` | Per-file indexing status (content hash, entity count, pipeline version) — what lets an unchanged file be skipped on the next incremental run. |
 | `embedding_cache` / `query_cache` | Content-hash-keyed embedding reuse, and cached query results. |
 | `audit_log` | The tool-call audit trail (which client called which tool, when, with what outcome) — see `observability/reference/logs-and-retention-reference` for its retention window, which is deliberately different from everything else in this list. |

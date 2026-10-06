@@ -82,6 +82,12 @@ previously-wrong resolution). A single entity or edge can have many
 historical versions stacked over time, each with its own closed valid-time
 range except the current one, which stays open.
 
+These historical versions aren't kept indefinitely — a background sweep
+hard-deletes a closed-out version once it's older than
+`bitemporal_history_retention_days` (90 days by default), so the table
+doesn't grow unbounded on a repository with a long history of frequent
+changes. See `configuration/reference/configuration-reference`.
+
 ## See also
 
 - `temporal/explanation/temporal-intelligence` — the blame pipeline and

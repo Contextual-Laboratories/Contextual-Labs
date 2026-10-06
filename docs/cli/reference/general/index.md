@@ -45,7 +45,7 @@ contextual index --cancel
 
 <Terminal lines={[
   {command: "contextual index"},
-  {output: "Indexing started…\n  extracting graph + blame + keyword search…\n  extracting symbols + embedding…\nDone. 412 files, 3,108 chunks.", muted: true}
+  {output: "Indexing started…\n  extracting graph + blame + keyword search…\n\n  ✓ dynamic index ready\n  This repository is now searchable — graph and temporal data are\n  available, and AI agents can query it now.\n  ready in 8.2s\n\n  extracting symbols + embedding…\nDone. 412 files, 3,108 chunks.", muted: true}
 ]} />
 
 <Callout variant="note">
@@ -56,6 +56,38 @@ loss), the next `contextual index` or `contextual doctor` detects it and
 either resumes or reports the failure, rather than reading as healthy
 indefinitely. The embedding step runs entirely on CPU — no GPU
 dependency, no network call.
+</Callout>
+
+<Callout variant="note">
+**While a bulk index runs:**
+
+- **Your machine stays awake.** The job holds an idle-sleep assertion for its
+  whole run (macOS `caffeinate`, Windows execution-state, Linux
+  `systemd-inhibit`) and releases it when it ends — even if the job crashes.
+  Only *idle* sleep is prevented; closing the lid or choosing Sleep still sleeps
+  the machine.
+- **One model copy.** When the MCP daemon is running, the job sends every
+  embedding to the daemon's already-loaded model instead of loading a second
+  copy in its own process, and it never falls back to loading one mid-run.
+- **The daemon steps aside.** For the workspace being indexed, the daemon
+  defers its startup reconciliation, periodic maintenance, git-hook indexing and
+  live file events until the job finishes, then catches up on its own.
+  `contextual doctor` shows what was deferred.
+- **Recorded test traffic is skipped.** HTTP cassettes (`cassettes/`,
+  `vcr_cassettes/`, `*.cassette.yml`) and `.har` captures are machine-written
+  recordings, not code or documentation, so they are left out of the index; the
+  job reports how many files each skip rule dropped. Oversized *source* and
+  documentation files are indexed in bounded windows instead of being dropped.
+</Callout>
+
+<Callout variant="note">
+The "dynamic index ready" milestone is a persisted panel, not an
+ephemeral spinner line — it prints once, above the live status, the
+moment graph/blame/keyword search actually becomes queryable, and a
+`contextual index --status` call that attaches *after* this already
+happened still shows it rather than jumping straight to the Deep Index
+line. See `indexing/explanation/how-indexing-works` for what "ready"
+means at that point versus what Deep Index still fills in.
 </Callout>
 
 ## See also

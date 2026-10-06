@@ -40,6 +40,29 @@ engine upgrade changed its content.
   {output: "Wrote ~/.claude/skills/contextual/SKILL.md\n\nSome clients need a restart or window reload to pick up a newly installed skill.", muted: true}
 ]} />
 
+## What the skill file contains
+
+The tool descriptions your client loads at session start say when to
+call each tool. The skill file, which is loaded only when a task calls
+for it, teaches an agent how to use Contextual as a whole:
+
+- **Precheck** — a rule that the skill applies only when a Contextual
+  tool is connected in the session, and how to handle clients that load
+  tool schemas lazily.
+- **Core rules** — consult Contextual before answering questions about
+  the codebase, run `graph_impact` before any delete, rename or signature
+  change, and record settled architectural decisions as ADRs.
+- **Tool routing** — which tool to start from for understanding code,
+  following dependencies, changing code, history and rationale, and
+  health.
+- **A working guide** — the four common workflows, how to write an
+  entity ID (a hash or a `path:Class.method` name), how to read coverage,
+  confidence and degree numbers without treating an empty result as proof
+  of absence, and what to do when something blocks the agent: an empty
+  index, an unresponsive daemon, or an account or license message.
+
+The skill file and the tool list together are kept under 10,000 tokens.
+
 ## Where each client's skill file goes
 
 Every path below is under your home directory and is written

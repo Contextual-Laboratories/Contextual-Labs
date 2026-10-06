@@ -40,8 +40,7 @@ should treat as leads, not facts.
   ],
   "_meta": {
     "returned": 1,
-    "truncated": false,
-    "total_retrieved": 1,
+    "coverage": {"returned": 1, "has_more": false, "confidence": "resolved", "total_known": 1},
     "_resolution_summary": {"total_edges": 1, "by_tier": {"high": 1}}
   }
 }
@@ -75,12 +74,20 @@ the complete field list.)
    every entry here as "check this by hand," not as a confirmed
    dependent; see `graph/explanation/confidence-tiers-and-resolution` for
    why these exist at all instead of just being dropped.
-5. **For `change_type="signature_change"`, `_meta.completeness`** is
-   `"complete"`, `"partial"`, or `"unknown"`, alongside real
-   `confirmed_count`/`speculative_count` numbers — so you can tell "the
-   graph found nothing" apart from "the graph found this much and isn't
-   sure there's more." `"unknown"` (both counts zero) is not the same
-   claim as "confirmed safe."
+5. **`_meta.coverage`** is on every `graph_impact` response.
+   `confidence` is `"resolved"`, `"resolved_but_capped"` (real results,
+   but something other than your own filters held some back — check
+   `capped_by` and `hint`), or `"unknown"` (nothing found, nothing
+   capped). `"unknown"` is not the same claim as "confirmed safe": the
+   graph declines to guess at calls whose receiver type it can't
+   determine, so a dependent reached that way is simply absent.
+   `coverage.unresolved_count`, when present, counts unresolved call
+   sites that look like calls into this entity (same name and language,
+   from its file or a file that depends on it): possible callers to read
+   by hand, never a confirmed count. For rename and signature changes,
+   `coverage.speculative_supplement_count` tells you how many entries
+   `speculative_callers` holds, which never count toward `confidence`.
+   See `mcp/tools/explanation/reading-the-coverage-block`.
 
 ## Before trusting a low or zero count
 

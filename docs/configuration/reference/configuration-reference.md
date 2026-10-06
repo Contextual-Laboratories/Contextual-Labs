@@ -72,11 +72,24 @@ eviction (`model_idle_evict_seconds` default 1800, i.e. 30 minutes of
 inactivity before the ONNX arena is released;
 `model_eviction_check_interval_seconds` default 300), overridable via
 `CONTEXTUAL_MODEL_IDLE_EVICT_SECONDS`/`CONTEXTUAL_MODEL_EVICTION_CHECK_INTERVAL`.
-`[graph]` controls co-change edge sensitivity (`co_change_min_commits`
-default 2, `co_change_half_life_days` default 180) and staleness decay
-(`staleness_decay_days` default 30), overridable via
-`CONTEXTUAL_CO_CHANGE_MIN_COMMITS`, `CONTEXTUAL_CO_CHANGE_HALF_LIFE_DAYS`,
-and `CONTEXTUAL_STALENESS_DECAY_DAYS` respectively.
+`[graph]` controls co-change sensitivity and staleness decay:
+
+| Key | Default | Env override |
+|---|---|---|
+| `co_change_min_commits` | 2 | `CONTEXTUAL_CO_CHANGE_MIN_COMMITS` |
+| `co_change_min_confidence` | 0.05 | `CONTEXTUAL_CO_CHANGE_MIN_CONFIDENCE` |
+| `co_change_min_jaccard_strength` | 0.05 | `CONTEXTUAL_CO_CHANGE_MIN_JACCARD_STRENGTH` |
+| `co_change_half_life_days` | 180 | `CONTEXTUAL_CO_CHANGE_HALF_LIFE_DAYS` |
+| `staleness_decay_days` | 30 | `CONTEXTUAL_STALENESS_DECAY_DAYS` |
+
+`co_change_min_commits` (shared commits needed for a pairing to exist) and
+`co_change_min_confidence` (the minimum share of an entity's own commits
+a pairing must account for) decide which co-change edges are written at
+index time, so changing them takes effect on the next index.
+`co_change_min_jaccard_strength` is the query-time boundary between
+`strong_change_coupling` and `weak_change_coupling` in
+`co_change_analysis`; changing it applies to the next query. See
+`temporal/how-to/interpret-co-change-analysis-results`.
 
 ## Global config — `~/.contextual/global_config.toml`
 
@@ -91,6 +104,7 @@ workspace-level one above.
 | `startup_timeout` | 15 (seconds) | How long daemon startup is given to report ready before it's treated as a failure. |
 | `rate_limit_per_minute` / `rate_limit_per_hour` | 600 / 12,000 | Flat, per-client MCP request caps — same limit for every client regardless of access level. |
 | `compaction_on_startup` / `compaction_interval_hours` / `compaction_retention_hours` | true / 6.0 / 1.0 | LanceDB fragment/version compaction schedule — keeps high-churn tables from accumulating unbounded version files. |
+| `bitemporal_history_retention_days` | 90 | How long an invalidated `entities`/`triples`/`adrs` version is kept as real history before a background sweep hard-deletes it — see `graph/reference/graph-schema-reference`. |
 | `heap_monitor_enabled` / `heap_monitor_interval_seconds` / `heap_trim_threshold_mb` | true / 30 / 800 | Memory-trim behavior — see `indexing/reference/sizing-and-machine-requirements`. |
 | `memory_trim_restart_threshold_count` | 5 | Consecutive still-over-threshold trims (with no active sessions) before the daemon requests its own clean restart instead of retrying a trim that isn't reclaiming anything. `0` disables the restart backstop. |
 | `workspace_idle_evict_minutes` | 30.0 | Minutes a workspace can go untouched before its file watcher, connector, and caches are released (transparently re-initialized on the next tool call). `0` disables. |

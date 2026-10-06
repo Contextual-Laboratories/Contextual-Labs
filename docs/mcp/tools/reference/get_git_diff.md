@@ -22,6 +22,11 @@ deletion counts and a changed-file list.
   repo-relative file.
 - `workspace` (string, optional).
 
+When the diff includes the working tree (`target="WORKING"`) and has
+changes, the response carries a `suggestion` to run `contextual index .`.
+A diff between two committed refs never does — there is nothing the index
+could be behind on.
+
 ## When to use it (and when not to)
 
 Call it for "what changed since X," "show me the diff," or "what did

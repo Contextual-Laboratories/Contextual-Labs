@@ -17,6 +17,11 @@ just to get the hash.
 
 - `entity_id` (string, required) — entity hash or FQN
   (`path/to/file.py:ClassName.method`) to start from.
+  Besides a raw hash or an FQN, a bare symbol name (`LanceDBConnector`)
+  or a repo-relative file path (`contextual/storage/connection.py`) also
+  resolves. If several entities share a bare name, the most-referenced
+  one is chosen; use an FQN when you need a specific one. See
+  `troubleshooting/entity-not-found`.
 - `depth` (integer, 1–3, default 1) — hops to walk.
 - `predicate` (string, optional) — restrict to one edge type (e.g.
   `calls`, `imports`); pass `"potential_call"` to include speculative
@@ -40,6 +45,18 @@ resolved and should be treated as advisory only, not a confirmed
 dependency graph.
 </Callout>
 
+<Callout variant="note">
+Every response carries `_meta.coverage` (`returned`, `has_more`,
+`confidence`, and `capped_by` plus a matching `hint` when something was
+held back). When `has_more` is true the response also leads with a
+top-level `_status` sentence ("Showing 12 of 31 matches — …"). For
+`direction="backward"` or `"bi"`, `coverage.dependents_confidence` judges
+the backward results alone: `"resolved"` (dependents found), `"unknown"`
+(none found — not the same as verified-absent), or `"speculative_only"`
+when you passed `predicate="potential_call"`. See
+`mcp/tools/explanation/reading-the-coverage-block`.
+</Callout>
+
 ## When to use it (and when not to)
 
 Call it once you have an `entity_id`/FQN from a search result and want
@@ -51,3 +68,4 @@ yet (search first), or you only need direct callers —
 
 - `mcp/tools/reference/graph_get_entity_callers`,
   `mcp/tools/reference/graph_impact`.
+- `mcp/tools/explanation/reading-the-coverage-block`.

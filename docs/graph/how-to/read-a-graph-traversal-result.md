@@ -42,8 +42,7 @@ unordered bag of everything reachable within `depth` hops.
   "total_nodes": 1,
   "_meta": {
     "returned": 1,
-    "truncated": false,
-    "total_retrieved": 1,
+    "coverage": {"returned": 1, "has_more": false, "confidence": "resolved", "total_known": 1},
     "_resolution_summary": {"total_edges": 1, "by_tier": {"high": 1}}
   }
 }
@@ -73,9 +72,14 @@ the complete parameter and field list.)
    result; a large `speculative` share (only present at all if you
    passed `predicate="potential_call"` — it's excluded by default)
    means treat the result as leads, not confirmed facts.
-4. **`_meta.truncated`** — if `true`, `nodes` doesn't contain
-   everything that matched; `_meta.total_retrieved` has the real count
-   and `_meta.hint` (when present) suggests a narrower follow-up query.
+4. **`_meta.coverage`** — `has_more: true` means `nodes` doesn't
+   contain everything that matched; `total_known` has the best available
+   count, `capped_by` names what held results back, and `hint` says
+   whether raising `limit` would help or you need a narrower query. For
+   `direction="backward"` or `"bi"`, `dependents_confidence` judges the
+   backward results alone, and `confidence: "unknown"` means nothing was
+   found, which is not the same as verified-absent. See
+   `mcp/tools/explanation/reading-the-coverage-block`.
 
 ## `graph_find_path` reads differently
 

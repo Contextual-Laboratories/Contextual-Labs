@@ -17,9 +17,9 @@ what's there today — nothing aspirational.
 - Current tier and, during a trial, a countdown to the first charge.
 - Device list: each entry shows activation date, IP, and a friendly
   name, with a Remove button.
-- A "Manage billing" button (once you have an active subscription,
-  hands off to Dodo's hosted Customer Portal) or a "Subscribe" link to
-  `/payments` (if you don't).
+- Inline cancel/resume and invoice history (once you have an active
+  subscription) or a "Subscribe" link to `/payments` (if you don't) —
+  only updating your payment method redirects to Dodo's hosted portal.
 - A Danger Zone with account deletion — see
   `website/reference/account-deletion-reference`.
 

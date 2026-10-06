@@ -40,7 +40,17 @@ semantic/keyword paths, but no graph entities at all — `graph_impact`,
 `graph_traverse`, and similar tools have nothing to find for these files:
 
 Scala, Dart, Lua, Perl, R, Haskell, Elixir, plus structured/config
-formats: JSON, YAML, TOML, Dockerfile, Markdown, SQL, HTML, CSS, SCSS.
+formats: JSON, YAML, TOML, Dockerfile, SQL, HTML, CSS, SCSS, and
+prose formats: Markdown, reStructuredText (`.rst`), AsciiDoc (`.adoc`),
+and plain text (`.txt`).
+
+<Callout variant="note">
+The four prose formats above (Markdown, `.rst`, `.adoc`, `.txt`) are
+chunked by section heading rather than by tree-sitter AST — there's no
+tree-sitter grammar for prose, so they never go through the same parser
+the code languages above do. This doesn't change their tier: they're
+still chunk-only, fully searchable, no graph entities.
+</Callout>
 
 ## What this means practically
 

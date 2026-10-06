@@ -22,7 +22,16 @@ before diagnosing a problem, not a live health check.
 Returns `activity` (`total_calls`, `raised_errors`, `avg`/`p95`
 `latency_ms`, `by_tool`, `total_tokens`, `avg_tokens_per_call`,
 `priciest_tools`), `recent_errors`, `internal_error_span_count`,
-`slow_operations`, and `priciest_operations`.
+`slow_operations`, `priciest_operations`, and `process_metrics`.
+
+`process_metrics` is the running daemon's operational metrics — embed queue
+wait and compute histograms, chunks embedded, background work deferred while a
+bulk index ran, git subprocess latency, and whether a bulk job currently holds
+the machine-wide model lease. Unlike everything else here it is **not** a window
+over `since`: it is in-memory and covers the daemon's life since its last
+restart. Internal daemon calls (such as an indexing job embedding through the
+daemon) appear as their own `internal.embed` / `internal.index` spans and are
+not counted as tool calls or tokens.
 
 ## Two distinct, non-interchangeable error counts
 

@@ -28,7 +28,7 @@ flowchart TD
     subgraph dyn["Dynamic Index (no model needed)"]
         A[Discover files] --> B["Blame + graph extraction\n(entities + relationships, blame-enriched inline)"]
         B --> C["CHA/RTA polymorphic-dispatch pass\n+ graph compaction"]
-        C --> D["Build keyword/BM25 search index\n(lexical_files)"]
+        C --> D["Build keyword/BM25 search indexes\n(lexical_files + lexical_chunks)"]
     end
     D --> E
     subgraph deep["Deep Index (needs the embedding model)"]
@@ -57,16 +57,25 @@ pass resolves interface/abstract-method calls to their concrete
 implementations, followed by graph compaction — both moved here because
 neither one actually needs the embedding model.
 
-**4. Keyword/BM25 search index.** File content is written to a dedicated
-`lexical_files` table — whole-file granularity, no dependency on the
-chunker or embedding model — so keyword search works the moment this
-stage commits, independent of how long Deep Index takes.
+**4. Keyword/BM25 search indexes.** File content is written to a dedicated
+`lexical_files` table at whole-file granularity. The same tree-sitter
+chunker Deep Index uses also runs here and writes function- and
+class-sized chunks to a separate `lexical_chunks` table, with no
+embedding involved. Neither table depends on the embedding model, so
+keyword search works the moment this stage commits, independent of how
+long Deep Index takes, and chunk-level matches can point at the right
+function instead of just the right file. Both tables are removed
+automatically a couple of hours after Deep Index completes for a
+workspace, since the full chunk indexes replace them.
 
-Once Dynamic Index finishes, `search`/`nexus_search`, graph traversal, and
-blame-enriched tools are all fully queryable — `search`/`nexus_search`
-transparently fall back to the `lexical_files` keyword layer if Deep
-Index hasn't caught up yet for this workspace (see
-`retrieval/how-to/understand-stale-or-missing-results`).
+Once Dynamic Index finishes, `search`/`nexus_search`, graph traversal,
+blame-enriched tools, and `co_change_analysis` are all fully queryable —
+`search`/`nexus_search` transparently fall back to the keyword layer
+(`lexical_chunks` and `lexical_files`) if Deep Index hasn't caught up yet for this workspace (see
+`retrieval/how-to/understand-stale-or-missing-results`). `contextual
+index`'s watch loop (and a `--status` call attaching after the fact)
+prints a persisted "dynamic index ready" milestone the moment this tier
+commits — see `cli/reference/general/index`.
 
 ### Deep Index — runs after, in the background
 
@@ -83,12 +92,29 @@ Finally, the `code_chunks`/`doc_chunks` full-text indexes are rebuilt so
 `search` returns fresh results without a daemon restart.
 
 <Callout variant="note">
+When the MCP daemon is running, the indexing job sends its embedding
+requests to the daemon's already-loaded model instead of loading a
+second copy in its own process. While it does, it holds a short-lived,
+machine-wide lease (renewed every 20 seconds, abandoned after 90 seconds
+of silence, so a crashed job can't block anything) and the daemon's
+incremental file watchers hold their own embedding work until the lease
+is released. Deferred changes are picked up by a reconcile pass
+afterward, so nothing is lost. The earlier behavior, two model copies
+competing for the same CPU cores and a lot of memory, caused erratic
+per-batch latency. With no daemon running, the job loads its own model
+for the whole phase as before. If the daemon becomes unreachable partway
+through a run, the job fails loudly instead of silently loading a second
+copy.
+</Callout>
+
+<Callout variant="note">
 Within Dynamic Index, graph/blame extraction runs *before* Deep Index's
 chunking and embedding — a deliberate July 2026 reorder that predates the
 tiered split: graph extraction was measured taking ~76 minutes inside the
 full pipeline despite being provably ~20-30 seconds in isolation, the
 leading theory being resource contention with the embedding model's ONNX
-session (which claims every CPU core) when the two ran back to back.
+session (which, at the time, claimed every CPU core) when the two ran back
+to back.
 Nothing in graph extraction depends on chunks or embeddings, so it
 correctly belongs in the tier that doesn't wait on the model at all.
 </Callout>

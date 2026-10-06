@@ -1,0 +1,201 @@
+id: "C003"
+domain: "engine"
+pypiVersion: "1.0.3"
+date: "2026-09-20"
+commit: "2a72698"
+summary: >
+  `contextual doctor` now reports and can self-heal a broken license
+  state instead of staying silent about it, several trial/license
+  messages that could go stale or leak information are fixed, and the
+  dependency graph closes out a real gap: method/field type declarations
+  are now modeled as edges, fixing Kotlin (which previously had zero
+  graph entities at all) along with dead type-extraction code for
+  Python, C#, and Swift. Also folds in a real cross-platform indexing
+  fix from the v1.0.1 CI hardening pass that never got its own release
+  note. On top of that: `contextual fetch` gets a more reliable
+  downloader with live progress, Dynamic Index readiness is now a
+  persisted terminal milestone instead of an ephemeral spinner change,
+  file-level authorship (previously always null) is fixed on both the
+  write and read side, every MCP tool that can truncate results now
+  leads with a plain-language status sentence instead of a buried flag,
+  and a false "stuck tool call" telemetry alarm plus a `doctor` Models
+  false-positive are both root-caused and fixed.
+entries:
+  - tag: feature
+    title: "`contextual doctor` now checks your license — and can fix it"
+    description: >
+      A 10th check, **License**, reports your current phase (trial
+      running, active paid subscription, in grace after a lapse, or
+      hard-expired) with days remaining where relevant — reading only
+      your local, already-signed license file, no network call on the
+      common path. If it finds a stale or missing license file
+      alongside a still-valid login session, it now makes one bounded,
+      cooldown-limited repair attempt before reporting failure, so a
+      routine `doctor` run can often self-heal a split state instead of
+      just describing it.
+    content:
+      type: code
+      label: terminal
+      code: |
+        $ contextual doctor
+          …
+          Indexing Job     OK    Last run: succeeded.
+          Index Freshness  OK    Up to date.
+          License          OK    Trial active — 9 days left.
+  - tag: fix
+    title: "Trial status could keep showing stale days-remaining for up to ~9 days after you paid"
+    description: >
+      `contextual account` and the daemon's startup trial banner read a
+      trial end date captured once at login instead of the live license
+      state — converting to paid mid-trial without re-running
+      `contextual login` meant seeing "Trial · N days remaining" well
+      after the subscription was already active. Both now source status
+      from a live check, with a clear "trial period, then your
+      subscription continues automatically" message for that case
+      instead of silence or a stale nag.
+  - tag: fix
+    title: "A transient network blip during the hourly license recheck could kill the running daemon"
+    description: >
+      The background license-recheck loop treated every repair failure
+      the same way — including a plain network hiccup — and SIGTERM'd
+      the daemon on any of them, ending in-progress sessions over
+      something that would have resolved on its own. It now
+      distinguishes a transient network failure from a definitive
+      rejection and only stops the daemon for the latter.
+  - tag: fix
+    title: "An inactive-license error could leak activation-flow detail to an AI client"
+    description: >
+      The MCP-facing license check is required to stay to bare facts for
+      an AI agent that might relay the text — `wrong_device` and a few
+      related reasons were missing from that neutral-messaging list and
+      could surface a link/detail meant for a human reading their own
+      terminal. All `invalid`-phase reasons now consistently use the
+      neutral variant on that surface.
+  - tag: feature
+    title: "Method and field type declarations are now real edges in the dependency graph"
+    description: >
+      Two new predicates, `references_type` and `references_field_type`,
+      model a method's declared parameter/return type and a class or
+      struct's own declared field/property type — closing the last gap
+      in type-declaration coverage (the graph now sits at 21 predicates,
+      up from 19). Previously, code that only ever referenced a type
+      through a signature or a field declaration, never a call or an
+      instantiation, was invisible to `graph_impact` and
+      `graph_traverse` entirely.
+  - tag: fix
+    title: "Kotlin functions and methods had zero graph entities at all"
+    description: >
+      Kotlin was already listed as a full-graph language, but its actual
+      function/method extraction was silently producing nothing — there
+      was no `body` field on `class_declaration` in the installed
+      grammar shape the extractor assumed. Fixed by locating `class_body`
+      as a direct child instead; Kotlin now genuinely has the graph
+      coverage it was already claiming.
+  - tag: fix
+    title: "Typed parameter and return-type binding was dead code for Python, C#, and Swift"
+    description: >
+      A real extraction path existed for typed function signatures in
+      these three languages, but it was never actually reached given the
+      installed tree-sitter grammars' real node shapes — every call
+      silently produced nothing. Fixed and verified against the live
+      grammars rather than assumed from the original implementation.
+  - tag: improvement
+    title: "`graph_traverse` and `graph_impact` now break ties using the query itself"
+    description: >
+      When multiple results land at the same graph distance, results are
+      now tie-broken by lexical relevance to the original query instead
+      of an arbitrary stable order, so the more relevant of two
+      equally-close results surfaces first.
+  - tag: improvement
+    title: "Tool-result caching now covers `graph_impact`, `co_change_analysis`, and `graph_at_time`"
+    description: >
+      Caching was previously wired only into `search`/`nexus_search` —
+      these three tools always read as "uncached" even on a repeated,
+      identical call. They now share the same per-workspace cache and
+      invalidation trigger `search` uses, so a repeated call goes stale
+      on exactly the same event a repeated search would, never longer.
+  - tag: improvement
+    title: "Workspace identity is now deterministic across devices, not random"
+    description: >
+      `contextual init` previously minted a random `workspace_id` per
+      install, so two clones of the same repository could never
+      recognize each other as the same workspace. New workspaces now
+      derive their id from the repo's git remote when one exists,
+      falling back to the old random behavior only when no stable fact
+      is available. Existing workspaces are unaffected — this only
+      applies to a fresh `contextual init`.
+  - tag: improvement
+    title: "Unified terminal output across every CLI command"
+    description: >
+      Every command now renders through a single terminal-output system
+      instead of ad hoc formatting calls scattered per command — more
+      consistent spacing, color, and spinner behavior across the whole
+      CLI, with no behavior change to any command's actual output data.
+  - tag: fix
+    title: "Indexed file paths could store Windows backslashes instead of forward slashes"
+    description: >
+      One lexical-index call site built its stored `file_path` directly
+      from a `Path` object without the same backslash-to-forward-slash
+      normalization every other path-handling call site in the codebase
+      already applied — a real cross-platform bug where lexical search
+      could store and match paths inconsistently with the rest of the
+      index on Windows. Fixed to match the existing normalization
+      pattern.
+  - tag: feature
+    title: "`contextual fetch` shows live download progress and won't hang on a bad connection"
+    description: >
+      The local embedding model download now goes through a dedicated
+      downloader instead of a third-party path with no visible progress:
+      live percent and speed print in the terminal as it runs, the
+      download is bounded by timeout and retry instead of hanging
+      indefinitely on a slow or dropped connection, and an interrupted
+      attempt cleans up after itself rather than leaving a broken partial
+      model directory behind.
+    content:
+      type: code
+      label: terminal
+      code: |
+        $ contextual fetch
+        downloading CodeRankEmbed — 42% (3.2 MB/s)
+          ✓ CodeRankEmbed ready
+  - tag: feature
+    title: "Dynamic Index readiness is now a persisted milestone, not just a spinner change"
+    description: >
+      The moment Dynamic Index (graph, blame, keyword search) finishes
+      and becomes queryable — well before Deep Index's embedding step —
+      `contextual index`'s live view now prints a persisted "dynamic
+      index ready" panel above the status line, including how long it
+      took. A `contextual index --status` call that attaches after that
+      milestone already passed still shows it, instead of only ever
+      reflecting whatever's currently running.
+  - tag: fix
+    title: "File-level authorship was silently broken on both the write and read side"
+    description: >
+      Every file (as opposed to function/class-level) entity's author
+      and commit attribution sat permanently null — the intent to
+      attribute a file to its most recent commit existed only as an
+      unimplemented comment, so `get_file_content` and
+      `graph_get_entity_definition` never returned real authorship for a
+      file itself. A separate lookup used by `search`'s ranking pass had
+      the same symptom for a different reason: it matched file entities
+      on the wrong field and always came back empty. Both are fixed —
+      file-level authorship now populates correctly end to end.
+  - tag: feature
+    title: "Truncated results now lead with a plain-language status sentence"
+    description: >
+      Every list/search/graph MCP tool that can truncate results now
+      puts that fact front and center — a leading sentence like "Showing
+      12 of 31 matches — narrow your query, add filters, or raise limit
+      to see different results" — instead of only a `truncated: true`
+      flag buried in metadata that a calling agent had to already know
+      to look for.
+  - tag: fix
+    title: "Fixed false 'stuck tool call' telemetry alarms and a doctor Models false-positive"
+    description: >
+      The MCP server's persistent listen-connection to a client was
+      being logged as a stuck tool call every time a client reconnected
+      after an idle period, showing up as spurious multi-minute "stalls"
+      in telemetry that were never real. Also fixed a `contextual
+      doctor` Models check that could keep reporting the embedding model
+      as loaded after it had actually been unloaded during an idle
+      period.

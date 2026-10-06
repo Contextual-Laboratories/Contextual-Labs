@@ -24,11 +24,16 @@ No arguments or flags. Requires `contextual setup` to have run already
 
 <Terminal lines={[
   {command: "contextual fetch"},
-  {output: "Downloading CodeRankEmbed INT8 (ONNX/fastembed)...\nDone.", muted: true}
+  {output: "downloading CodeRankEmbed — 42% (3.2 MB/s)\n  ✓ CodeRankEmbed ready", muted: true}
 ]} />
 
 If the model is already cached, `fetch` reports it as already present
 and re-pins its BLAKE3 integrity hash rather than re-downloading.
+
+The download itself shows live percent and speed as it runs, and is
+timeout- and retry-bounded rather than hanging indefinitely on a slow or
+dropped connection — a failed attempt cleans up after itself instead of
+leaving a partial model directory behind.
 
 <Callout variant="note">
 The model is `nomic-ai/CodeRankEmbed`, a code-specialized embedding model

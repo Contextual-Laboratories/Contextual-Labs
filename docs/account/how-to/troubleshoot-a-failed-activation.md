@@ -36,10 +36,13 @@ grace period active or expired).
 contextual doctor
 ```
 
-License/activation problems don't show up as their own `doctor` line
-directly, but a broken **Configuration** or **Directories** check can
-be the underlying cause of an activation that looks like it failed for
-no reason.
+`doctor`'s dedicated **License** check reports your current phase
+(trial, paid, in grace, or expired) and, if it finds a stale or missing
+license file alongside a still-valid login session, makes one bounded
+repair attempt before reporting failure — running `doctor` can resolve
+some activation-looking problems on its own. A broken **Configuration**
+or **Directories** check can also be the underlying cause of an
+activation that looks like it failed for no reason.
 
 ## If you moved machines without deactivating first
 

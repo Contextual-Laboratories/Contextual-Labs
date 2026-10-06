@@ -2,24 +2,31 @@
 title: Plans & billing reference
 domain: website
 category: reference
-tldr: "Solo is the only live tier: $10/mo or $100/yr, 14-day trial (card required, not charged until day 15), 1 active device with up to 3 swaps/month. Teams and Enterprise are waitlist-only."
+tldr: "Solo is the only live tier: $10/mo or $100/yr, 14-day trial with no card or payment info required to start, 1 active device with up to 3 swaps/month. Teams and Enterprise are waitlist-only."
 order: 2
 ---
 
 <Callout variant="tldr">
-Solo is $10/month or $100/year, with a 14-day trial that requires a
-card at signup but doesn't charge it until day 15. Teams and Enterprise
-aren't purchasable yet — they're a real waitlist, not a placeholder.
+Solo is $10/month or $100/year. The trial is genuinely free to start —
+no card, no payment info, just an explicit "Start free trial" click —
+and nothing is ever charged automatically. Teams and Enterprise aren't
+purchasable yet — they're a real waitlist, not a placeholder.
 </Callout>
 
 ## Solo (the only live tier)
 
 - **Price**: $10/month, or $100/year (roughly $8.33/month-equivalent).
-- **Trial**: 14 days from signup. A card is required at signup but is
-  not charged during the trial. Email verification is required before
-  the trial is provisioned.
-- **First charge**: fires automatically on day 15 unless you've
-  cancelled first.
+- **Trial**: 14 days, starting only when you explicitly click "Start
+  free trial" on your account page — never automatically at signup or
+  email verification. No card or payment info is collected for this.
+  If you never convert, the trial simply lapses at no charge, since
+  there's no card on file to charge.
+- **Converting to paid**: a separate, explicit action — go to the
+  payments page, enter a card, and complete checkout. The charge fires
+  immediately on checkout completion, not on a delay. If you still have
+  trial days left when you convert, they stack on top of the new
+  billing cycle at no extra charge, rather than being lost or
+  scheduling a delayed first charge.
 - **Refund windows**: 24 hours from any charge for monthly billing, 7
   days for annual — per charge, not per purchase. After the window
   closes, you can still cancel any time, but you ride out the already-
@@ -37,8 +44,10 @@ purchase path for either yet.
 
 ## What isn't enforced yet
 
-There is no in-app plan-downgrade flow — only cancellation, through
-Dodo's hosted billing portal.
+There is no in-app plan-downgrade flow. Cancel and resume are real
+inline actions on your account page, not a handoff to Dodo's hosted
+portal — only "update payment method" still redirects there, since
+Dodo has no API to attach a new card outside a checkout/portal session.
 
 ## See also
 

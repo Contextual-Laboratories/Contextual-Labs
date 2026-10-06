@@ -2,14 +2,16 @@
 title: Activate a trial
 domain: account
 category: how-to
-tldr: Sign up on the website (this starts your trial automatically), then run contextual login on the device you want to use — no separate trial-activation command exists.
+tldr: Sign up and explicitly click "Start free trial" on the website (no card required), then run contextual login on the device you want to use — no separate CLI trial-activation command exists.
 order: 1
 ---
 
 <Callout variant="tldr">
-There's no dedicated "start trial" command. Signing up on the website
-starts your trial; `contextual login` is what activates it on a given
-device.
+There's no dedicated "start trial" CLI command. Signing up on the
+website only creates your account — you have to explicitly click
+"Start free trial" on your account page to actually start the 14-day
+clock (no card or payment info required). Once that's done,
+`contextual login` is what activates it on a given device.
 </Callout>
 
 ```

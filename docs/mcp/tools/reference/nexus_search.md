@@ -40,14 +40,37 @@ semantic snippets with no graph context (use `search`), or you're doing
 co-change analysis (use `co_change_analysis`).
 
 <Callout variant="note">
-If Deep Index hasn't finished yet for this workspace, the response's
-stale warnings carry a `DYNAMIC_INDEX_ONLY` note flagging that semantic
-results may still be incomplete — unlike `search`, which actively
-reroutes to the keyword layer in that window, this is a heads-up rather
-than a behavior change. See `indexing/explanation/how-indexing-works`.
+Every response carries `_meta.coverage` (`returned`, `has_more`,
+`confidence`, and `capped_by` plus a matching `hint` when something was
+held back, including when the response hit its size budget). When
+`has_more` is true the response also leads with a top-level `_status`
+sentence ("Showing 12 of 31 matches — …"). See
+`mcp/tools/explanation/reading-the-coverage-block`.
+</Callout>
+
+<Callout variant="note">
+If a query's seed selection had to fall back to keyword/lexical matching
+instead of an embedding match — typically because Deep Index hasn't
+finished embedding what the query needed — the response's
+`stale_warnings` carry a `DYNAMIC_INDEX_ONLY` entry. The warning is tied
+to that specific call, not to the workspace as a whole: a query answered
+from embeddings that already exist doesn't get it, even while Deep Index
+is still running. It's a heads-up rather than a behavior change. See
+`indexing/explanation/how-indexing-works`.
+</Callout>
+
+<Callout variant="note">
+`WEAK_ANN_SEED` appears in `stale_warnings` when the best embedding match
+scored below the real-match floor, so the search fell back to keyword
+seeding instead of expanding the graph from a seed already known to be
+unrelated. `WEAK_MATCH_SIGNAL` appears when the top matches cleared that
+floor but didn't stand out from the rest of the pool. Either one means
+the structural neighborhood may be anchored to the wrong place; try
+different search terms.
 </Callout>
 
 ## See also
 
 - `mcp/tools/reference/search`, `mcp/tools/reference/graph_traverse`.
+- `mcp/tools/explanation/reading-the-coverage-block`.
 - `mcp/tools/explanation/tool-taxonomy`.

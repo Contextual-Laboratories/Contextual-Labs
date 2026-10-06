@@ -21,7 +21,8 @@ the whole call — this page walks through what to read on each.
 
 ```
 {
-  "_meta": { "returned": ..., "truncated": ..., "total_retrieved": ..., "include_code": ... },
+  "_status": "...",
+  "_meta": { "returned": ..., "coverage": { "has_more": ..., "confidence": ... }, "include_code": ... },
   "nodes": [ ... ],
   "temporal": { "recent_commits": [...], "blame": {...}, "adrs": [...], "velocity_summary": {...} },
   "stats": { "total_nodes": ..., "stale_count": ..., "depth_used": ... },
@@ -30,11 +31,24 @@ the whole call — this page walks through what to read on each.
 }
 ```
 
-- `_meta.truncated` is `true` when the traversal found more nodes than
-  `limit` kept after the diversity pass — check `_meta.hint` when this
-  happens; it points you at `include_code=True` for a specific node or
-  `get_file_content` for the full body, rather than raising `limit`
-  blindly.
+- `_status` is only present when `_meta.coverage.has_more` is `true` — a
+  plain sentence ("Showing 12 of 31 matches — …") that puts the same
+  completeness signal front and center instead of requiring you to
+  check a field buried in `_meta` first.
+- `_meta.coverage` says how much of the real answer you're looking at.
+  `has_more: true` means something was held back; `capped_by` names
+  what (`limit`, `hydration_cap`, `diversity_cap`, or `token_budget`)
+  and `hint` says whether raising `limit` would help or whether you
+  should narrow the query, drop `include_code`, or use `get_file_content`
+  for a specific node's full body. `confidence` is `"resolved"`,
+  `"resolved_but_capped"`, or `"unknown"` (nothing found). See
+  `mcp/tools/explanation/reading-the-coverage-block`.
+- `_meta.response_budget` and `_meta.omitted_fields` appear when the
+  response was trimmed to fit its size budget: whole trailing nodes
+  (counted in `excluded_by_budget`) or low-priority node fields.
+- `stale_warnings` may carry `DYNAMIC_INDEX_ONLY` (this query's seeding
+  fell back to keyword matching), `WEAK_ANN_SEED` or `WEAK_MATCH_SIGNAL`
+  (the seed match was weak). See `mcp/tools/reference/nexus_search`.
 - `temporal` is keyed on the semantic seed entities, not on every
   returned node — it's the same shape `get_temporal_context` returns.
   See `mcp/tools/reference/get_temporal_context` and

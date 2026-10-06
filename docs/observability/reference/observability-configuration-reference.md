@@ -32,8 +32,8 @@ process, not any one workspace.
 |---|---|---|
 | `tracing_enabled` | `true` | Whether the OpenTelemetry SDK is initialized at all. |
 | `trace_sample_rate` | `1.0` | Fraction of operations traced (root sampler); `1.0` = every operation, no sampling. |
-| `service_name` | `"contextual"` | Reported on every span/log row's `service_name` field. |
-| `service_version` | current package version | Reported alongside `service_name`. |
+| `service_name` | `"contextual"` | Fallback `service_name`. Each process reports its own **role** instead: `contextual-daemon`, `contextual-index-job` (the background indexing job) or `contextual-cli`, so spans from the daemon and from an indexing job are distinguishable. |
+| `service_version` | `""` (= current package version) | Reported alongside `service_name`. Leave empty to report the installed release; set it only to pin a different label. |
 
 ## Export
 
@@ -43,6 +43,19 @@ process, not any one workspace.
 | `export_batch_size` | `100` | Max spans/logs per export batch. |
 | `export_flush_interval_ms` | `5000` | How often a batch flushes even if not yet full. |
 
+## Optional OTLP export (off by default)
+
+Nothing leaves your machine unless you set an endpoint. With one set — and
+the optional `otlp` extra installed (`pip install 'contextual-engine[otlp]'`) —
+traces and metrics are *also* sent to any OpenTelemetry-compatible collector,
+alongside the local tables. A missing extra is a logged warning, never a startup
+failure.
+
+| Key | Default | What it controls |
+|---|---|---|
+| `otlp_endpoint` | `null` | OTLP/HTTP base URL (e.g. `http://localhost:4318`); `/v1/traces` and `/v1/metrics` are appended. When empty, the standard `OTEL_EXPORTER_OTLP_ENDPOINT` environment variable is honored. |
+| `otlp_headers` | `{}` | Extra headers sent with every OTLP request (e.g. an auth token). |
+
 ## Retention
 
 | Key | Default | What it controls |
@@ -51,6 +64,12 @@ process, not any one workspace.
 | `audit_log_retention_days` | `90` | How long `audit_log` rows are kept — deliberately separate and longer; see `observability/explanation/the-audit-log`. |
 | `prune_on_startup` | `true` | Whether a prune pass runs once when the daemon starts. |
 | `prune_interval_hours` | `24` | How often the recurring background prune runs. |
+
+## Subprocess reporting
+
+| Key | Default | What it controls |
+|---|---|---|
+| `slow_subprocess_ms` | `2000` | A `git` subprocess call is reported as its own event only if it fails, times out, or takes longer than this. Every call, however fast, still lands in the `contextual.git.subprocess.duration` histogram. |
 
 ## Instrumentation scope
 

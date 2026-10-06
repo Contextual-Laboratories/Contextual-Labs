@@ -1,0 +1,192 @@
+id: "C006"
+domain: "engine"
+pypiVersion: "1.0.3"
+date: "2026-10-03"
+commit: "b134271"
+summary: >
+  A trust-and-correctness pass across the graph, co-change, and search
+  tools: every tool that reports how complete its answer is now does so
+  through one consistent block that can't contradict itself,
+  `co_change_analysis` follows files and entities across renames and
+  uses a scoring model calibrated against real repositories, keyword
+  search before Deep Index finishes now matches at function level,
+  and bulk indexing no longer loads a second copy of the embedding
+  model alongside the daemon's.
+entries:
+  - tag: fix
+    title: "Completeness reporting in graph and nexus tools can no longer contradict itself"
+    description: >
+      `graph_impact`, `graph_traverse`, `graph_get_entity_callers`, and
+      `nexus_search` used to describe how complete their answer was
+      through several separate fields that could disagree, for example
+      reporting a result as statically complete and truncated at once.
+      They now share one `_meta.coverage` block: how many results came
+      back, whether more exist, a confidence of `resolved`,
+      `resolved_but_capped`, or `unknown`, and, when something was held
+      back, which mechanism did it (the `limit`, an internal candidate
+      ceiling, a per-file diversity cap, or the response-size budget)
+      along with advice that matches the cause instead of always saying
+      "raise limit". Responses that hit the size budget now say so.
+  - tag: fix
+    title: "`co_change_analysis` keeps a coupling across a rename"
+    description: >
+      Renaming a file or entity used to leave its earlier co-change
+      history attached to the old identity, so a real coupling could
+      read as weak or disappear right after a rename. Earlier identities
+      are now merged into the result, and the response lists them under
+      `lineage_prior_entity_ids`. Whole-file renames are detected from
+      git's own content-similarity rename detection rather than by
+      comparing file names, which almost never matched a renamed file.
+  - tag: improvement
+    title: "Co-change scoring recalibrated against real repositories"
+    description: >
+      The minimum strength for a `strong_change_coupling` label moved
+      from 0.03 to 0.05, chosen from measured data: generic build, CI,
+      and lint files had been landing in the strong bucket. A new
+      `co_change_min_confidence` setting (default 0.05, also settable as
+      `CONTEXTUAL_CO_CHANGE_MIN_CONFIDENCE`) replaces a second fixed
+      commit-count cutoff that zeroed out real signal in busy
+      repositories. Each partner also carries
+      `confidence_focal_to_partner` and `confidence_partner_to_focal`,
+      the directional chance that one entity changes when the other
+      does. Partners and `summary.strongest_coupling` are now ranked by
+      the undecayed `historical_strength`, so an old but real coupling
+      isn't outranked by a recent, weak one. Re-index to apply the
+      write-time settings.
+  - tag: fix
+    title: "`co_change_analysis` can tell declared from undeclared coupling for whole files"
+    description: >
+      When the entity being analyzed was a whole file, every partner
+      was reported as undeclared coupling even if the file imported from
+      it, because dependency edges point at individual functions and
+      classes, never at a file. A new file-level `file_depends_on` edge
+      rolls a file's dependencies up so the check works. Receipt-fetch
+      failures are now flagged instead of looking like "no shared
+      commits", and the response stays within the shared size budget when
+      `include_receipts` is on.
+  - tag: improvement
+    title: "Keyword search before Deep Index finishes now matches at function level"
+    description: >
+      While embeddings are still being built, `search` and
+      `nexus_search` fall back to keyword search. That used to match
+      whole files only, and part of the fallback was silently doing
+      nothing because of a broken import. It now tries entity
+      definitions first, then function- and class-sized chunks, then
+      whole files, so results point at the right function rather than
+      just the right file. The `DYNAMIC_INDEX_ONLY` warning on
+      `nexus_search` now appears only for queries that actually fell
+      back, not for every query during that window. The temporary
+      keyword tables are cleaned up automatically after Deep Index
+      completes.
+  - tag: fix
+    title: "`decision_search` finds decisions the embedding missed"
+    description: >
+      Architectural decisions are prose, and the embedding model is tuned
+      for code, so a freshly written decision could fail to come back
+      for its own title. `decision_search` is now hybrid: an exact or
+      near-exact keyword match rescues results the embedding under-ranks.
+      Each result reports `match_type` (`semantic` or `lexical`), and a
+      keyword result has a `null` score instead of an invented one.
+  - tag: improvement
+    title: "Faster search diversity pass"
+    description: >
+      The structural near-duplicate fingerprints that keep search from
+      returning several look-alike functions are now computed once at
+      index time instead of on every query, saving roughly 100 ms on a
+      large candidate pool. Chunks indexed before this change are
+      handled automatically and gain the stored fingerprint on their
+      next index.
+  - tag: improvement
+    title: "Bulk indexing shares the daemon's embedding model"
+    description: >
+      When the daemon is running, an indexing job used to load its own
+      copy of the embedding model, and the two fought over the same CPU
+      cores and memory, which caused per-batch times to swing from
+      seconds to minutes. The job now sends its embedding to the daemon's
+      already-loaded model, and the daemon's background file watchers
+      pause their own embedding until it finishes. Embedding threads
+      are now sized to your machine's performance cores instead of every
+      core (overridable with `CONTEXTUAL_ONNX_THREADS`), which removes a
+      second source of the same slowdown on Apple Silicon.
+      `contextual doctor` gains a Daemon Activity row while the daemon is
+      indexing in the background, and its Indexing Job row now appears
+      only when a job is running or has failed.
+  - tag: fix
+    title: "`get_stats` and `get_doctor` report Deep Index progress honestly"
+    description: >
+      `get_stats` used to report `status: "ready"` unconditionally, and a
+      canceled or crashed indexing job was treated as finished. Both
+      now say `deep_index_running` until Deep Index has actually
+      completed, with `deep_index.ready`, `percent_complete`, and a
+      plain-language note. `get_doctor` carries the same information on
+      its index check.
+  - tag: fix
+    title: "Graph tools accept bare symbol names and file paths, and explain misses better"
+    description: >
+      Several graph tools treated anything without a `/` or `:` as a raw
+      hash and silently matched nothing, so asking `graph_at_time` for
+      `LanceDBConnector` returned "entity not present" for a class that
+      has always existed. `graph_traverse`, `graph_impact`,
+      `graph_get_entity_callers`, `graph_get_entity_definition`,
+      `graph_find_path`, and `graph_at_time` now resolve a hash, an FQN,
+      a repo-relative file path, or a bare symbol name consistently. A
+      miss now distinguishes a file excluded by `.contextualignore`
+      (`ENTITY_EXCLUDED_FROM_INDEX`) from an index that is behind your
+      working tree from a name that doesn't exist.
+  - tag: fix
+    title: "`graph_find_path` only follows real dependency edges"
+    description: >
+      Path search treated every edge type as a valid hop, including
+      "this class defines this method". A class merely instantiated near
+      the source plus that containment edge was enough to report a path
+      to a method that is never called. Paths now follow only real
+      dependency and usage edges. Edge metadata such as a raise-wrapped
+      instantiation is now carried through `graph_impact`,
+      `graph_get_entity_callers`, and `graph_find_path` instead of being
+      lost before it reached the response.
+  - tag: fix
+    title: "Calls the resolver couldn't bind are recorded instead of silently dropped"
+    description: >
+      A call through a loop variable or an untyped parameter used to leave
+      no trace at all. The resolver still declines to guess a target,
+      since a wrong guess adds false dependents, but it now records the
+      call as unresolved, and `graph_impact` and
+      `graph_get_entity_callers` report how many such call sites look like
+      calls into the entity (same name and language, from its file or a
+      file that depends on it) under `coverage.unresolved_count`. It is a
+      "possible callers" figure, never a confirmed count, and it doesn't
+      change `confidence`.
+  - tag: fix
+    title: "Tool descriptions and empty `nexus_search` responses match the real response shape"
+    description: >
+      The descriptions that AI clients read for `graph_impact`,
+      `graph_traverse`, and `graph_get_entity_callers` still told them to
+      look for the old `completeness` and `confirmed_count` fields, which
+      no longer exist, and never mentioned `_meta.coverage`. They now
+      describe the real block, including what `confidence: "unknown"`
+      does and doesn't prove. A `nexus_search` that found no seed match
+      returned the old `truncated`/`total_retrieved` shape with no
+      `coverage` block; it now carries the same `coverage` as every other
+      response, with `confidence: "unknown"`.
+  - tag: fix
+    title: "Smaller correctness fixes in history and search"
+    description: >
+      File entities are now stamped with the timestamp of their latest
+      commit rather than the time they were indexed, so `graph_at_time`
+      no longer reports files as absent at every past point.
+      `get_temporal_context` no longer drops in-window commits for an
+      entity with a long history. `search` previews are centered on the
+      part of a long chunk that matched your query, and a document named
+      like an audit or review report no longer outranks the code it
+      describes. `nexus_search`'s keyword fallback tiers report an honest
+      low confidence instead of a fabricated 1.0, and its zero-seed
+      message no longer blames an unpopulated index when the real reason
+      is the query.
+  - tag: fix
+    title: "PyPI packages no longer include the repository"
+    description: >
+      Published source packages for earlier releases contained the whole
+      repository (tests, docs, internal planning files) instead of just
+      the product. Releases now publish a wheel only, the source package
+      is restricted to an explicit allowlist, and the release pipeline
+      refuses to publish any artifact that contains anything outside it.

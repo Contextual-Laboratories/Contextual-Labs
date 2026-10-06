@@ -32,7 +32,7 @@ what it does and where.
 | `query_cache_ttl_seconds` | `[retrieval]` | `retrieval/reference/retrieval-configuration-reference` |
 | `ann_index_row_threshold` | `[retrieval]` | `indexing/reference/sizing-and-machine-requirements` |
 | `model_idle_evict_seconds`, `model_eviction_check_interval_seconds` | `[daemon]` | `mcp/server/explanation/mcp-daemon-lifecycle-and-hot-reload` |
-| `co_change_min_commits`, `co_change_half_life_days` | `[graph]` | `temporal/how-to/interpret-co-change-analysis-results` |
+| `co_change_min_commits`, `co_change_min_confidence`, `co_change_min_jaccard_strength`, `co_change_half_life_days` | `[graph]` | `temporal/how-to/interpret-co-change-analysis-results` |
 | `staleness_decay_days` | `[graph]` | `temporal/explanation/staleness-scoring-and-bitemporal-fields` |
 
 There is no `[cache]` section — see
@@ -48,10 +48,13 @@ likewise fixed engine defaults, not `config.toml` keys.
 | `die_after_idle_hours`, `startup_timeout`, `workspace_idle_evict_minutes` | `[daemon]` | `mcp/server/explanation/mcp-daemon-lifecycle-and-hot-reload` |
 | `rate_limit_per_minute`, `rate_limit_per_hour` | `[daemon]` | `mcp/server/explanation/mcp-client-access-control` |
 | `compaction_on_startup`, `compaction_interval_hours`, `compaction_retention_hours` | `[daemon]` | `indexing/reference/sizing-and-machine-requirements` |
+| `bitemporal_history_retention_days` | `[daemon]` | `graph/reference/graph-schema-reference` |
 | `heap_monitor_enabled`, `heap_monitor_interval_seconds`, `heap_trim_threshold_mb`, `memory_trim_restart_threshold_count` | `[daemon]` | `indexing/reference/sizing-and-machine-requirements` |
 | `log_level`, `log_format`, `log_to_file`, `log_file_path` | `[observability]` | `observability/explanation/how-tracing-and-logging-work` |
 | `tracing_enabled`, `trace_sample_rate`, `service_name`, `service_version` | `[observability]` | `observability/explanation/how-tracing-and-logging-work` |
 | `export_to_lancedb`, `export_batch_size`, `export_flush_interval_ms` | `[observability]` | `observability/how-to/enable-otel-export-for-a-debugging-session` |
+| `otlp_endpoint`, `otlp_headers` | `[observability]` | `observability/reference/observability-configuration-reference` |
+| `slow_subprocess_ms` | `[observability]` | `observability/reference/observability-configuration-reference` |
 | `retention_days`, `audit_log_retention_days`, `prune_on_startup`, `prune_interval_hours` | `[observability]` | `observability/reference/logs-and-retention-reference` |
 | `instrument_indexing`, `instrument_retrieval`, `instrument_mcp`, `instrument_storage` | `[observability]` | `observability/explanation/how-tracing-and-logging-work` |
 | per-client access policies | `[clients]` | `mcp/server/explanation/mcp-client-access-control` |

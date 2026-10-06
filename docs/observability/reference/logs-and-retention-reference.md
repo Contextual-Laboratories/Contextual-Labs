@@ -47,6 +47,13 @@ from exactly two kinds of table:
   retention policy just because a shared background loop happens to
   sweep both.
 
+Each table declares which column ages a row out and in what unit — the
+telemetry tables store `created_at` as epoch **milliseconds**, the audit table
+as a native timestamp — and the pruner and the writers both read that one
+declaration. `get_doctor`'s `retention` check reports a table that holds rows
+older than **twice** its window (a healthy pruner leaves none), so a pruner that
+has quietly stopped working is visible even across daemon restarts.
+
 <Callout variant="warning">
 This is the single easiest thing to get wrong about Contextual's storage:
 retention applies **only** to the two categories above. It does **not**

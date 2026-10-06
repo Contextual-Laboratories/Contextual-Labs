@@ -108,7 +108,11 @@ directly, before MMR selection runs:
    supports), stripped of variable names, string contents, and comments.
 2. That sequence is fingerprinted with **MinHash** over overlapping
    5-token shingles, so two chunks with a very similar structural
-   "shape" produce a very similar fingerprint.
+   "shape" produce a very similar fingerprint. The fingerprint is
+   computed once when a chunk is indexed and stored with it, not
+   recomputed on every query. Chunks indexed before this was stored are
+   fingerprinted on the fly at query time instead, so results are
+   unaffected, and a re-index fills it in.
 3. Every candidate pair is compared via estimated **Jaccard
    similarity** on those fingerprints. Pairs at or above a fixed
    similarity threshold are treated as structurally near-duplicate.

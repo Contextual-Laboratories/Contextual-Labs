@@ -2,21 +2,25 @@
 title: First-time activation walkthrough
 domain: account
 category: tutorial
-tldr: Sign up on the website, then run contextual login in your terminal — that one command activates your license on this device and starts your trial clock.
+tldr: Sign up on the website, start your trial explicitly (no card required), then run contextual login in your terminal — that one command activates your license on this device.
 order: 1
 ---
 
 <Callout variant="tldr">
 There's no separate "activation" step beyond `contextual login`. Signing
-up on the website creates your account and trial; running `contextual
-login` is what actually activates the license on a given device.
+up on the website only creates your account — you still need to
+explicitly start a trial before `contextual login` has a license to
+activate.
 </Callout>
 
-## 1. Create your account
+## 1. Create your account and start your trial
 
 Sign up on the website first (see `website/tutorials/create-an-
-account-and-link-your-first-device` for that side of the flow). This is
-what provisions your trial.
+account-and-link-your-first-device` for that side of the flow), then
+click "Start free trial" on your account page — no card or payment
+info required. Skipping this step means `contextual login` below will
+fail with a "you don't have an active subscription yet" error, since
+there's no license to activate yet.
 
 ## 2. Activate this device
 

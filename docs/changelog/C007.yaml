@@ -1,0 +1,161 @@
+id: "C007"
+domain: "engine"
+pypiVersion: "1.0.3"
+date: "2026-10-05"
+commit: "546d8ee"
+summary: >
+  A graph-correctness and reliability pass. Re-saving a file no longer
+  erases the edges other files had into it, the full index and the
+  incremental path now resolve a file identically, and a definition that
+  appears later reaches the files already waiting for it. Functions
+  defined inside other functions no longer collapse into one entity, and
+  decorators, `super()` calls and calls on a constructor's result now
+  show up as dependencies. Search filters apply during retrieval instead
+  of after the result cut, indexing and the daemon coordinate instead of
+  competing, and the MCP tool list an AI client loads at the start of
+  every session is less than half its previous size. Existing indexes
+  re-extract on the next `contextual index`.
+entries:
+  - tag: fix
+    title: "Re-saving a file no longer erases the edges other files had into it"
+    description: >
+      Saving a file closed every dependency edge pointing at it, including
+      edges whose sources had not changed, so `graph_impact` and
+      `graph_get_entity_callers` quietly lost dependents after each save.
+      The incremental path now retires an edge only when something stops
+      it being true. A related bug that linked an unrelated same-named
+      method in another file as a rename after a re-save is also fixed.
+  - tag: fix
+    title: "The full index and the incremental path resolve a file the same way"
+    description: >
+      The same file could produce different edges depending on whether it
+      came through a full index or an incremental update, and ties
+      between equal candidates depended on the order files were
+      processed. Both paths now share one resolution routine, so the
+      graph is a function of the workspace's contents, not of how or in
+      what order it was built.
+  - tag: fix
+    title: "A definition added later now reaches the files already waiting for it"
+    description: >
+      A reference to a symbol that did not exist yet stayed unresolved
+      until its own file was saved again, even after the definition was
+      added elsewhere. Files that mention a name are now tracked, and
+      when a definition appears or disappears, only the files that could
+      be affected are re-resolved.
+  - tag: fix
+    title: "Functions defined inside other functions are separate entities"
+    description: >
+      Several inner functions with the same name in one file, or an inner
+      function with the same name as a module-level one, were merged into
+      a single entity with the combined edges of all of them. On this
+      repository that silently lost 86 definitions across 29 files and
+      inflated one helper's outgoing edges to 403. Nested functions now
+      carry their enclosing function in their identity
+      (`path.py:outer.<locals>.inner`) and are visible only to the code
+      that can reach them. Existing indexes re-extract on the next
+      `contextual index`.
+  - tag: improvement
+    title: "Decorators, `super()` and calls on a constructor's result are now dependencies"
+    description: >
+      A function now depends on the decorators applied to it, so changing
+      a decorator shows everything it decorates in `graph_impact`; these
+      edges carry `via: "decorator"` in `edge_metadata`. `super().method()`
+      resolves to the method of the class's base, and `Cls(args).method()`
+      resolves to `Cls.method`. Built-in decorators such as `@property`
+      and `@staticmethod` add no edge.
+  - tag: fix
+    title: "In-degree and out-degree are counted live"
+    description: >
+      Degree counters were stored on versioned rows, so every save left
+      the saved entities reading 0 and the tiebreak between same-named
+      entities ranked on stale numbers. Degrees are now counted from
+      active edges wherever they are shown or ranked on.
+  - tag: fix
+    title: "Search filters apply during retrieval, not after the result cut"
+    description: >
+      `language`, `file_path` and `symbol_type` filters used to run after
+      ranking and the `limit` cut, so a filtered search could return
+      nothing while matching code existed. They now narrow the candidates
+      before ranking, so the results are the best matches within the
+      filter. While the deep index is still building, filters can still
+      apply after ranking, and `search` says so with a
+      `FILTERED_AFTER_RANKING` warning instead of staying silent.
+  - tag: fix
+    title: "Near-duplicate demotion no longer switches off silently on fresh installs"
+    description: >
+      A new major version of a dependency stopped the structural
+      diversity step from working on fresh installs, and the failure was
+      logged at debug level so nothing showed it. The dependency is now
+      bounded to a working version, and a failure of that step logs a
+      warning the first time it happens.
+  - tag: improvement
+    title: "Indexing and the daemon coordinate instead of competing"
+    description: >
+      A bulk index and the daemon's background work now share one
+      admission policy per workspace, so a starting index is not starved
+      and the daemon does not write over it. The job always sends its
+      embedding to the daemon's loaded model, so a second copy can no
+      longer be loaded by a forgotten code path. A bulk index holds the
+      machine awake while it runs, and a process that has exited but not
+      been reaped is no longer mistaken for a live one.
+  - tag: improvement
+    title: "One trace follows an index run from the job into the daemon"
+    description: >
+      The index job, the daemon and the CLI now export OpenTelemetry
+      spans under a shared trace, with workspace and service role on
+      every event. Telemetry retention, which never actually pruned
+      because the schema, exporter and pruner disagreed on the time
+      column's type, now works, and `contextual doctor` reports when
+      rows are older than the retention window.
+  - tag: fix
+    title: "Oversized files and recorded HTTP fixtures no longer break chunking"
+    description: >
+      A file whose body exceeded the chunk size was dropped by a fallback
+      that broke the size contract. Chunks are now bounded windows
+      through one shared path, never an error or a silent cut. Recorded
+      data (cassette directories, `*.cassette.*`, `.har` files) is
+      skipped at discovery with a per-reason count in the discovery log.
+  - tag: fix
+    title: "Model download is checksummed and survives a truncated archive"
+    description: >
+      The embedding-model archive had no integrity check, and a truncated
+      download without a length header escaped the retry loop as a raw
+      error. The download is now verified against a pinned SHA-256 before
+      anything is extracted, and a mismatch or truncation is retried.
+  - tag: fix
+    title: "Smaller correctness fixes in diagnostics and tool responses"
+    description: >
+      `diagnose_issue` no longer reports normal background indexing as an
+      unusually slow, uncoded error. A path that fails to resolve is no
+      longer always labelled a symlink loop. `get_git_diff` only suggests
+      re-indexing when the diff includes the working tree.
+      `co_change_analysis` with compact output now fills the language,
+      change-count and degree columns for partners and keeps the
+      pair-level coupling figures in a labelled `partner_coupling` block.
+  - tag: fix
+    title: "File identity is the same on Windows, macOS and Linux"
+    description: >
+      On Windows a file's workspace-relative path was stored with backslashes, so entity ids
+      differed from the same repository indexed elsewhere, forward-slash names such as
+      `pkg/api.py:get` did not resolve, co-change history attached to ids that matched no file,
+      and chunk paths in search results used backslashes. Every path is now spelled one way:
+      forward slashes, Unicode NFC, relative to the workspace. A lookup that differs only in
+      letter case resolves when exactly one entity matches. Git file names with accents or
+      other non-ASCII characters, which git prints as escapes by default, are now read
+      correctly on every OS, and git output is decoded as UTF-8 on Windows. Directory
+      junctions are skipped like symbolic links, so a junction can no longer cause a loop or
+      pull in files from outside the workspace. Paths past the Windows length limit and
+      `\\?\` or network-share spellings are handled.
+  - tag: improvement
+    title: "The MCP tool list is less than half its size"
+    description: >
+      Every client loads the tool list at the start of every session. It
+      was about 13,100 tokens and is now about 6,900, with identical
+      tool names, parameters, types and defaults. Descriptions now say
+      what a tool is for, when to use it instead of a sibling, and the
+      few caveats where a wrong guess matters (an empty graph result is
+      not proof of no dependents). The installed skill gained a guide to
+      the common workflows, how to read coverage and confidence, and what
+      to do when something blocks you. Re-run `contextual skill` to pick
+      it up. In a 50-request check the right tool was picked 98.0% of the
+      time before and after.

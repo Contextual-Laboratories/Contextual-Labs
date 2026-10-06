@@ -54,8 +54,10 @@ are keyed by that convention, not the bare path, so a plain
   shallow checkout.
 - `adrs` — ADRs linked to this entity via a `motivated_by` edge,
   restricted to `accepted` status, capped at 3.
-- `velocity_summary` — `commit_count` and `most_active_author` over
-  the same `recent_commits` set, not a separate query.
+- `velocity_summary` — `commit_count_sample` and `most_active_author` over
+  the same `recent_commits` set, not a separate query. The name is
+  deliberate: it's the size of the capped `recent_commits` sample, not the
+  entity's true total commit count — see `commits_in_window` for that.
 
 ## `graph_at_time`: a bitemporal snapshot at one instant
 

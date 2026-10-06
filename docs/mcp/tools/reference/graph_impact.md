@@ -15,6 +15,11 @@ breaks as a result, ranked by hop distance.
 ## Parameters
 
 - `entity_id` (string, required) — entity hash or FQN to analyze.
+  Besides a raw hash or an FQN, a bare symbol name (`LanceDBConnector`)
+  or a repo-relative file path (`contextual/storage/connection.py`) also
+  resolves. If several entities share a bare name, the most-referenced
+  one is chosen; use an FQN when you need a specific one. See
+  `troubleshooting/entity-not-found`.
 - `change_type` (`"delete"` | `"rename"` | `"signature_change"`, default
   `"delete"`) — controls which edge types and traversal depth are used.
 - `limit` (integer, 1–50, default 30).
@@ -42,15 +47,47 @@ drive a refactoring decision without manual verification.
 </Callout>
 
 <Callout variant="note">
-For `change_type="signature_change"`, `_meta` also carries a
-`completeness` field (`"complete"` | `"partial"` | `"unknown"`) alongside
-`confirmed_count`/`speculative_count` — a real count of what was
-statically confirmed versus what's only speculative, so you can tell
-"the graph found nothing" apart from "the graph found this much and
-isn't sure there's more." Responses may also drop low-priority fields
-(staleness, degree, edges, temporal, authorship, then commit data, in
-that order) under a response-size budget before dropping whole nodes —
-check `_meta.omitted_fields` if a node looks unexpectedly sparse.
+Every response carries `_meta.coverage`, which says how much of the
+real answer you're looking at: `returned`, `has_more`, a `confidence` of
+`"resolved"`, `"resolved_but_capped"` or `"unknown"`, and — when
+something was held back — `capped_by` naming the cause (`limit`,
+`hydration_cap`, `diversity_cap`, or `token_budget`) with a matching
+`hint`. Only some causes are fixed by raising `limit`; the hint says
+which. It replaces the older `completeness`, `truncated` and
+`confirmed_count` fields, so the response can no longer claim to be both
+complete and truncated. See `mcp/tools/explanation/reading-the-coverage-block`.
+</Callout>
+
+<Callout variant="note">
+An impacted node whose edge carries metadata, such as `via: "raise"` for
+an instantiation inside a raise statement or `via: "decorator"` for a
+function that is decorated by the entity, shows it under
+`edge_metadata`. The field is absent when the edge has none. Note that
+the older `via_predicate` field is unrelated: it names the edge type that
+connected the node.
+</Callout>
+
+<Callout variant="note">
+`coverage.unresolved_count` appears when the resolver found call sites
+it declined to bind (for example a call through an untyped parameter)
+that look like calls into this entity: same name, same language, from
+this entity's file or a file that depends on it. It is a heuristic
+"possible callers" figure, never a confirmed count, and it never changes
+`confidence`; `unresolved_count_capped: true` marks it as a lower bound.
+`confidence: "unknown"` means nothing was confirmed, not that nothing
+exists. For `change_type="rename"` and
+`"signature_change"`, `coverage.speculative_supplement_count` counts the
+entries in `speculative_callers`, which are kept out of `impacted_nodes`
+and out of `confidence`.
+</Callout>
+
+<Callout variant="note">
+Responses may drop low-priority node fields (commit data first, then
+authorship, temporal, edges, degree, and staleness last) under a
+response-size budget before dropping whole nodes — check
+`_meta.omitted_fields` if a node looks unexpectedly sparse. When
+`has_more` is true the response also leads with a top-level `_status`
+sentence ("Showing 12 of 31 matches — …") before any other field.
 </Callout>
 
 ## Why this matters
@@ -70,4 +107,5 @@ you want to see what an entity itself uses (its outgoing edges) — use
 ## See also
 
 - `mcp/tools/reference/graph_traverse`, `mcp/tools/reference/graph_get_entity_callers`.
+- `mcp/tools/explanation/reading-the-coverage-block`.
 - `mcp/tools/how-to/run-blast-radius-analysis-before-a-rename-or-delete`.

@@ -49,6 +49,50 @@ Turning tracing off (`tracing_enabled: false`) or export off
 (`export_to_lancedb: false`) doesn't touch structured logging at all —
 `contextual.log` keeps working either way.
 
+## One trace per indexing run, across two processes
+
+A bulk `contextual index` runs in its own background process, but the work
+it needs from the daemon (embedding) happens in the daemon. Both sides join
+**one** trace:
+
+- The indexing job opens a root span, `index.job`, with its phases
+  (`index.phase.dynamic_index`, `index.phase.deep_index`) as children, and
+  records the trace ID in its job state.
+- Every embed request the job makes to the daemon carries the standard W3C
+  `traceparent` header (and the workspace). The daemon's `internal.embed`
+  span is a *child* of the job's span, with the batch size, queue wait and
+  compute time as attributes.
+- The job exports its spans to the workspace's own `otel_spans` table, and its
+  log lines to `otel_logs` (each carrying the active span's trace and span ID),
+  the same places the daemon's go for that workspace, so one query shows the
+  whole run.
+
+Every span, metric and log row names the process that produced it
+(`service.name` = `contextual-daemon`, `contextual-index-job` or
+`contextual-cli`) along with standard OpenTelemetry resource attributes
+(`service.namespace`, `service.version`, `service.instance.id`,
+`process.pid`, host architecture, OS).
+
+Coordination facts are recorded as named events inside the trace they belong
+to: `lease.acquired` / `lease.released` / `lease.reclaimed` (the machine-wide
+model lease), `embed.backend.selected`, `background.deferred` /
+`background.resumed` (daemon work that stepped aside for a bulk job), and
+`power.sleep_guard.acquired` / `.released`.
+
+## Metrics
+
+Operational metrics use the standard OpenTelemetry metrics API:
+`contextual.embed.queue_wait` and `contextual.embed.compute` (histograms),
+`contextual.embed.chunks`, `contextual.background.deferred`,
+`contextual.git.subprocess.duration` and `contextual.model_lease.held`. Labels
+are deliberately coarse (kind, actor, reason, verb) — never file paths or
+workspace IDs. Current values for the running daemon appear in
+`get_telemetry`'s `process_metrics`; they are in-memory and reset when the
+daemon restarts. To send traces and metrics to your own OpenTelemetry
+collector as well, set `otlp_endpoint` — see
+`observability/reference/observability-configuration-reference`. It is off by
+default.
+
 ## Where each kind of data lands, and why per-workspace matters
 
 The daemon serves multiple workspaces out of one process. A span or

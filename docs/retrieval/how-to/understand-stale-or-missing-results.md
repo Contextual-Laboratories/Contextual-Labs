@@ -2,7 +2,7 @@
 title: Understand Why a Query Returned Stale or Missing Results
 domain: retrieval
 category: how-to
-tldr: A missing or stale-looking result almost always traces to one of four causes — the index hasn't caught up with a recent change, Deep Index is still running in the background, the entity genuinely isn't in the graph, or a high staleness score is correctly flagging content that's likely out of date.
+tldr: A missing or stale-looking result almost always traces to one of five causes — the index hasn't caught up with a recent change, Deep Index is still running in the background, the entity genuinely isn't in the graph, the top result fell below a real-match floor, or a high staleness score is correctly flagging content that's likely out of date.
 order: 6
 related:
   - indexing/explanation/incremental-vs-scheduled-indexing.md
@@ -11,11 +11,12 @@ related:
 ---
 
 <Callout variant="tldr">
-Before assuming something is broken, check which of three things you're
-actually looking at: the index hasn't caught up with a recent change yet,
-the graph genuinely has no record of what you're asking about, or a
-result came back with a high staleness score correctly telling you it's
-likely out of date.
+Before assuming something is broken, check which of these you're
+actually looking at: the index hasn't caught up with a recent change
+yet, the graph genuinely has no record of what you're asking about, the
+top result didn't actually clear a real-match floor, or a result came
+back with a high staleness score correctly telling you it's likely out
+of date.
 </Callout>
 
 ## Cause 1 — the index hasn't caught up yet
@@ -34,9 +35,13 @@ cheap and safe to run whenever you're unsure.
 Right after a fresh or forced `contextual index`, the fast Dynamic Index
 tier (graph, blame, keyword search) is queryable before Deep Index
 (embeddings) finishes — see `indexing/explanation/how-indexing-works`.
-During that window, `search`/`nexus_search` results come from keyword
-matching rather than full semantic ranking, and the response carries a
-`DYNAMIC_INDEX_ONLY` entry in its stale warnings. This isn't staleness in
+During that window, `search` results come from keyword matching
+(entity definitions first, then code-chunk matches, then whole files)
+rather than full semantic ranking, and the response carries a
+`DYNAMIC_INDEX_ONLY` entry in its stale warnings. `nexus_search` adds
+that entry only when the query's own seed selection had to fall back to
+keyword matching; a query answered from embeddings that already exist
+doesn't get it. This isn't staleness in
 the usual sense — it resolves on its own once Deep Index completes; check
 `contextual index --status` to see how far along it is.
 
@@ -50,7 +55,22 @@ exist in the index at all" — see
 distinction and why it matters. If you're seeing an explicit "not found"
 message rather than an empty result, that's this cause, not staleness.
 
-## Cause 4 — the result is stale, and Contextual is telling you so
+## Cause 4 — the result doesn't actually match, and Contextual is telling you so
+
+`search`'s response can carry two different `stale_warnings` entries
+that both mean "don't trust these results," for different reasons.
+`WEAK_MATCH_SIGNAL` means nothing in the returned pool stood out from
+the rest of it — a uniformly weak field. `NO_CONFIDENT_MATCH` catches
+the opposite shape: a single result that *did* stand out from an
+otherwise-weak pool (so `WEAK_MATCH_SIGNAL` wouldn't fire) while its own
+embedding similarity still falls below a real-match floor — a generic,
+highly-connected chunk that picks up partial term overlap with almost
+any query. Either one appearing means this codebase likely doesn't have
+strong matching vocabulary for that query; try different search terms
+rather than trusting the top result's `confidence` field, which only
+measures standout within this result set, not real-world relevance.
+
+## Cause 5 — the result is stale, and Contextual is telling you so
 
 Every entity the temporal layer touches carries a staleness score — how
 likely it is to be out of date, based on how often it normally changes
@@ -70,10 +90,13 @@ as intended rather than something to fix.
    Deep Index is still running; check `contextual index --status`.
 3. Is this a graph query returning an explicit "not found" rather than
    an empty result? → see `troubleshooting/entity-not-found`.
-4. Is the result present but flagged with high staleness? → that's a
+4. Does the response's `stale_warnings` include `WEAK_MATCH_SIGNAL` or
+   `NO_CONFIDENT_MATCH`? → the top result didn't clear a real-match
+   floor; try different search terms rather than trusting it.
+5. Is the result present but flagged with high staleness? → that's a
    signal, not a failure — treat it the way you'd treat a stale-review
    nudge.
-5. None of the above? Run `contextual doctor` and check the
+6. None of the above? Run `contextual doctor` and check the
    **Database**, **Daemon & Locks**, and **Indexing Job** lines — see
    `observability/how-to/interpreting-doctor-report`. An unhealthy index,
    a crashed indexing job, or a daemon serving a different workspace than

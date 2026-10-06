@@ -18,12 +18,30 @@ predicate and confidence.
   entity.
 - `target_entity_id` (string, required) — hash or FQN of the entity to
   find a path to.
+
+Both endpoints also accept a bare symbol name or a repo-relative file
+path. If several entities share a bare name, the most-referenced one is
+chosen; use an FQN when you need a specific one.
 - `max_depth` (integer, 1–5, default 5) — max hops to search before
   giving up.
 - `workspace` (string, optional).
 
 If no path exists within `max_depth`, the response says so explicitly
 (`found: false`) rather than an empty, ambiguous result.
+
+A path only follows real dependency and usage edges (calls, imports,
+inheritance, instantiation and similar), the same family
+of edges `graph_get_entity_callers` draws from. Containment edges such as "this class
+defines this method" and provenance edges such as authorship are never
+hops. Without that restriction, a class that was merely instantiated
+somewhere near the source plus a "defines" edge to one of its methods
+was enough to report a path to that method whether or not it is ever
+called. A hop that carries edge metadata, such as `via: "raise"` for an
+instantiation inside a raise statement, shows it under the hop's
+`metadata` field. When the response is large, low-priority node fields
+are dropped first (`_meta.omitted_fields`), and code detail is only
+upgraded to full source while the shared token budget allows
+(`_meta.response_budget`).
 
 ## When to use it (and when not to)
 

@@ -64,6 +64,16 @@ you're opening multiple clients simultaneously against a workspace for
 the first time, a brief "waiting for peer spawner" delay is expected
 behavior, not a bug.
 
+Underneath that spawn-lock, the daemon process itself also holds an
+OS-level exclusive lock for its entire lifetime, checked before it ever
+touches its own socket — not just during the brief spawn window. Even
+if two daemons somehow both got far enough to start binding, only one
+can actually win; the other exits instead of deleting the first one's
+live socket out from under it. In practice this means a second,
+orphaned-but-still-alive daemon silently taking over is no longer
+possible — if the daemon isn't responding, it's genuinely one of the
+other cases on this page, not a hidden second process.
+
 ## If none of these explain it
 
 Run `contextual doctor` and check the **Daemon & Locks** line

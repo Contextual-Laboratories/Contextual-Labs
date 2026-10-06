@@ -42,7 +42,12 @@ the new workspace:
 
 - **Decisions** — every ADR recorded via the graph/decision tools.
 - **Graph temporal history** — the bitemporal entity/triple versions
-  that `graph_at_time` reads, not just current-state entities.
+  that `graph_at_time` reads, not just current-state entities. This is
+  also subject to the same automatic retention window
+  (`bitemporal_history_retention_days`, 90 days by default — see
+  `configuration/reference/configuration-reference`) that prunes old
+  invalidated versions during normal operation, independent of whether
+  you ever run `--reset` at all.
 
 Pass `--decisions` to wipe those too, for a genuinely from-scratch
 reset:

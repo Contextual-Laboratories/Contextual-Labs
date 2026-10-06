@@ -32,6 +32,13 @@ malfunctioned. Prefer each candidate's `suggestion` field (and run its
 suggested command) over searching for the `error_code` itself, since
 Contextual's docs aren't guaranteed to cover every code yet.
 
+A call that finished but took 10 seconds or more (and never raised) is
+reported as a `warning` candidate with the real code `mcp_slow_operation`
+— a slow call is not an error, and is not labeled as one. Indexing work
+(`index.*` and `indexing.*` spans) is never reported this way: a full
+index of a real repository legitimately runs for minutes to hours in the
+background, so flagging it made a healthy system look broken.
+
 ## When to use it (and when not to)
 
 Call it when a problem is reported (or noticed) and you want one call

@@ -15,6 +15,11 @@ containing file.
 ## Parameters
 
 - `entity_id` (string, required) — entity hash or FQN to fetch.
+  Besides a raw hash or an FQN, a bare symbol name (`LanceDBConnector`)
+  or a repo-relative file path (`contextual/storage/connection.py`) also
+  resolves. If several entities share a bare name, the most-referenced
+  one is chosen; use an FQN when you need a specific one. See
+  `troubleshooting/entity-not-found`.
 - `workspace` (string, optional).
 
 ## When to use it (and when not to)

@@ -1,0 +1,50 @@
+id: "C005"
+domain: "engine"
+pypiVersion: "1.0.3"
+date: "2026-09-23"
+commit: "b57a7aa"
+summary: >
+  Two data-integrity fixes: a daemon startup race that could let a
+  second MCP daemon silently orphan a still-running one, and a real
+  violation of the graph's append-only guarantee where several write
+  paths were losing history on write instead of preserving it — both
+  fixed, with a new automatic retention window keeping the now-genuinely-
+  preserved history from growing unbounded.
+entries:
+  - tag: fix
+    title: "Closed a daemon-startup race that could orphan a running daemon"
+    description: >
+      A narrow timing window let a second Contextual MCP daemon start
+      while a first was still mid-boot; the second one would delete the
+      first's live socket and bind its own, leaving the first daemon
+      alive but unreachable and silently taking over in its place. The
+      daemon now holds an OS-level exclusive lock for its entire
+      lifetime, checked before it ever touches its own socket, so only
+      one daemon can ever actually win — the other exits cleanly instead
+      of stepping on a live one.
+  - tag: fix
+    title: "Graph and decision history could be silently lost on write, despite being documented as append-only"
+    description: >
+      The dependency graph and architectural decisions are documented as
+      bitemporal and append-only — a change should add a new version and
+      close out the old one, never overwrite it in place. Several
+      real write paths (co-change coupling, blame-driven author/staleness
+      corrections, and a couple of internal backfill passes) didn't
+      actually honor that, updating or replacing rows directly and
+      quietly losing the history `graph_at_time` and decision history
+      depend on. All of them now genuinely preserve history on every
+      write. A new automatic retention window
+      (`bitemporal_history_retention_days`, 90 days by default) keeps
+      that history from growing without bound by hard-deleting versions
+      once they've been superseded for longer than the window — see
+      `configuration/reference/configuration-reference`.
+  - tag: fix
+    title: "Fixed another orphaned index-directory leak, this time from a database migration"
+    description: >
+      Same bug class as the keyword-search index leak fixed earlier in
+      this release: a database migration's own index rebuilds weren't
+      tracked by the background garbage collector, so every time it ran
+      it left behind index directories that were never reclaimed — on
+      one real workspace, these outweighed the actual data they
+      indexed. Routed through the same tracked cleanup path as every
+      other index rebuild.

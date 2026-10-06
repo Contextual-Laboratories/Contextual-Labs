@@ -16,6 +16,16 @@ one call.
 
 - `workspace` (string, optional).
 
+## Deep Index status
+
+`status` is `"ready"` once Deep Index (embeddings) has completed for this
+workspace and `"deep_index_running"` while it hasn't, including when the
+last run was canceled or crashed before finishing. It used to read
+`"ready"` unconditionally. The `deep_index` block carries the detail:
+`ready` (boolean), `percent_complete` (number or null), and `note` (the
+plain-language explanation, or null). Counts read while `deep_index_running`
+are partial and still growing.
+
 ## When to use it (and when not to)
 
 Call it for freshness/coverage/health questions about Contextual's own

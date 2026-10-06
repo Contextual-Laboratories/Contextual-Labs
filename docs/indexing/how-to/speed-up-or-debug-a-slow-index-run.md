@@ -58,11 +58,15 @@ how far along it is, rather than guessing from wall-clock time alone:
 - Slow during **Dynamic Index** (blame/graph extraction): usually a very
   deep git history, or a huge number of files needing fresh blame (no
   cache hit yet) — this should get faster on the next run once the blame
-  cache is warm. Graph extraction cost is proportional to file count and
-  language mix — languages with full structural resolution (see
+  cache is warm. Commit-history collection for blame/co-change data runs
+  as a single repository-wide `git log` walk rather than one subprocess
+  per file, so this cost scales with history depth, not file count.
+  Graph extraction cost is proportional to file count and language
+  mix — languages with full structural resolution (see
   `indexing/reference/language-support-matrix`) cost more here than
-  chunk-only languages. Graph/blame/keyword search are already usable
-  once this tier finishes, even if Deep Index is still running.
+  chunk-only languages. Graph/blame/keyword search — including
+  `co_change_analysis` — are already usable once this tier finishes,
+  even if Deep Index is still running.
 - Slow during **Deep Index** (chunk + embed): this is the CPU-bound
   tier — see `indexing/how-to/size-your-machine-before-indexing-a-large-repo`
   for what actually drives its cost. Embedding uses every available core
