@@ -1,0 +1,23 @@
+id: "C008"
+domain: "engine"
+pypiVersion: "1.0.3"
+date: "2026-10-06"
+commit: "d8af846"
+summary: >
+  TODO (required before merge): one plain-language sentence for the
+  release timeline card and index list.
+entries:
+  # TODO (required before merge): replace this placeholder with one
+  # entry per notable change. Each entry needs:
+  #   tag: feature | improvement | fix | breaking
+  #   title: string (backtick-wrapped text renders as inline code)
+  #   description: string (same backtick support)
+  #   content: optional "code" or "stat-compare" block — see
+  #   Teams/Memory/changelog-yaml-schema.md for the full spec.
+  - tag: feature
+    title: "TODO"
+    description: "TODO"
+
+# Raw material — GitHub's auto-generated release notes for this tag, for reference while writing the entries above. Delete this comment block once done; it is not parsed.
+#
+# test: improve loopback server request handling for better timeout management
